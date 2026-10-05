@@ -13,6 +13,7 @@ latest release.
 
 | Mod | What it adds | Needs | Licence |
 |---|---|---|---|
+| [Instructor, Shut Up](mods/instructor-shut-up) | Mission 29 starts without the instructor's first line | OpenReliant 0.7 | MPL-2.0 |
 | [Viper Mk II](mods/viper) | A new ship type for the player: a fast, agile gunfighter with two kinetic guns, no blind fire, light shields and a strong hull | OpenReliant 0.7 | Model and pictures CC-BY-NC-4.0, by LocoPixel ([credits](mods/viper/license.txt)) |
 
 ## Installing a mod
