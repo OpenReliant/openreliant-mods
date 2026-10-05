@@ -59,7 +59,13 @@ body {{
     var(--bg);
   background-attachment: fixed; min-height: 100vh;
 }}
-main {{ max-width: 1000px; margin: 0 auto; padding: 48px 16px 64px; }}
+main {{ max-width: 1000px; margin: 0 auto; padding: 0 16px 64px; }}
+nav {{ display: flex; justify-content: space-between; align-items: center; padding: 20px 0 36px; font-family: var(--display); font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; }}
+nav .brand {{ color: var(--text); text-decoration: none; font-weight: 700; font-size: 20px; }}
+nav .brand span, nav .links a.current {{ color: var(--accent); }}
+nav .links a {{ color: var(--muted); text-decoration: none; margin-left: 22px; font-size: 15px; }}
+nav .links a:hover {{ color: var(--accent); }}
+@media (max-width: 520px) {{ nav .links a:not(.keep) {{ display: none; }} }}
 header {{ margin-bottom: 36px; }}
 .eyebrow {{ font-family: var(--display); color: var(--accent); letter-spacing: 0.3em; font-size: 15px; font-weight: 700; text-transform: uppercase; }}
 h1 {{ font-family: var(--display); margin: 2px 0 10px; font-size: clamp(34px, 7vw, 54px); line-height: 1; letter-spacing: 0.06em; text-transform: uppercase; font-weight: 700; }}
@@ -115,10 +121,19 @@ footer {{ color: var(--muted); font-size: 14px; margin-top: 28px; }}
 </head>
 <body>
 <main>
+<nav>
+<a class="brand" href="https://openreliant.github.io/openreliant/">Open<span>Reliant</span></a>
+<div class="links">
+<a class="keep" href="https://openreliant.github.io/openreliant/#download">Download</a>
+<a href="https://openreliant.github.io/openreliant/docs/">Docs</a>
+<a class="keep current" href="./">Mods</a>
+<a href="https://github.com/OpenReliant/openreliant-mods">GitHub</a>
+</div>
+</nav>
 <header>
 <div class="eyebrow">OpenReliant</div>
 <h1>Mods</h1>
-<p>Mods for <a href="https://github.com/OpenReliant/openreliant">OpenReliant</a>, checked to work and to be free to share. You need OpenReliant and your own copy of StarLancer.</p>
+<p>Mods for <a href="https://openreliant.github.io/openreliant/">OpenReliant</a>, checked to work and to be free to share. You need OpenReliant and your own copy of StarLancer.</p>
 </header>
 {engine}
 {mods}
