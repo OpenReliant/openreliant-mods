@@ -209,6 +209,9 @@ def card(mod, release: dict | None = None) -> str:
     if mod.needs and release and version_tuple(release["tagName"]) < version_tuple(mod.needs):
         badges.append(f'<span class="badge waiting">OpenReliant {text(mod.needs)} is coming soon</span>')
     licence = f'<a href="https://github.com/{REPOSITORY}/blob/main/mods/{text(mod.id)}/license.txt">Credits and licence</a>'
+    # The mod's own page, where its manifest gives one other than this collection.
+    if mod.url and REPOSITORY not in mod.url:
+        licence += f'<a href="{text(mod.url)}">Website</a>'
     if mod.released():
         download = (f'<a class="download" href="{text(mod.download())}">Download {text(mod.archive)}</a>'
                     f'<div class="links"><a href="{text(mod.download())}.sha256">Checksum</a>'

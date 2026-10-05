@@ -24,6 +24,7 @@ class Mod:
         self.author = about.get("author", "")
         self.description = about.get("description", "")
         self.needs = about.get("openreliant", "")
+        self.url = about.get("url", "")
         self.thumbnail = folder / "mod.png" if (folder / "mod.png").exists() else None
 
     @property
