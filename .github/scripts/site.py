@@ -4,8 +4,12 @@ needs, its description, and the download of its latest release.
     python3 .github/scripts/site.py
 """
 
+from __future__ import annotations
+
 import html
+import json
 import shutil
+import subprocess
 
 from mods import ROOT, REPOSITORY, all_mods, git
 
@@ -82,6 +86,23 @@ a {{ color: var(--accent); text-underline-offset: 2px; }}
 .links {{ margin-top: 12px; font-size: 14px; color: var(--muted); }}
 .links a {{ margin-right: 14px; }}
 .unreleased {{ color: var(--muted); font-style: italic; margin: 0; }}
+.engine {{
+  margin-bottom: 30px; padding: 20px 22px; background: var(--brackets), #0e111a;
+  background-repeat: no-repeat; box-shadow: inset 0 0 0 1px var(--card-edge);
+}}
+.engine h2 {{ font-family: var(--display); margin: 0 0 4px; font-size: 22px; letter-spacing: 0.08em; text-transform: uppercase; }}
+.engine h2 span {{ color: var(--accent); }}
+.engine p {{ margin: 0 0 14px; color: var(--muted); font-size: 14px; }}
+.builds {{ display: flex; flex-wrap: wrap; gap: 10px; }}
+.build {{
+  font-family: var(--display); font-weight: 600; font-size: 16px; letter-spacing: 0.05em; text-transform: uppercase;
+  text-decoration: none; color: var(--text); padding: 7px 14px; border: 1px solid var(--card-edge); background: #141824;
+  clip-path: var(--cut);
+}}
+.build:hover {{ border-color: var(--accent-dim); color: var(--accent); }}
+.build.yours {{ background: var(--accent); color: #140a02; border-color: var(--accent); }}
+.build.yours::before {{ content: "For this computer: "; }}
+.badge.waiting {{ color: #e6b24a; border-color: #6b5212; }}
 .install {{
   margin-top: 36px; padding: 18px 22px; border-left: 3px solid var(--accent); background: #0e111a; color: #cfd3dd;
 }}
@@ -99,6 +120,7 @@ footer {{ color: var(--muted); font-size: 14px; margin-top: 28px; }}
 <h1>Mods</h1>
 <p>Mods for <a href="https://github.com/OpenReliant/openreliant">OpenReliant</a>, checked to work and to be free to share. You need OpenReliant and your own copy of StarLancer.</p>
 </header>
+{engine}
 {mods}
 <section class="install">
 <h3>Installing a mod</h3>
@@ -108,17 +130,84 @@ footer {{ color: var(--muted); font-size: 14px; margin-top: 28px; }}
 <p><a href="https://github.com/{repository}">The mods' sources</a>, with each mod's credits and licence. Updated {updated}.</p>
 </footer>
 </main>
+<script>
+// Puts the build for this computer first and lights it: the system from the user agent, the
+// processor from the browser where it says, else the usual one (Apple silicon on a Mac).
+(function () {{
+  const agent = navigator.userAgent;
+  const system = /Windows/.test(agent) ? "windows" : /Mac/.test(agent) ? "macos" : /Linux|X11/.test(agent) && !/Android/.test(agent) ? "linux" : null;
+  if (!system) return;
+  const light = (processor) => {{
+    const build = document.querySelector(`.build[data-build="${{system}}-${{processor}}"]`);
+    if (!build) return;
+    document.querySelectorAll(".build.yours").forEach((other) => other.classList.remove("yours"));
+    build.classList.add("yours");
+    build.parentElement.prepend(build);
+  }};
+  light(system === "macos" ? "aarch64" : "x86_64");
+  if (navigator.userAgentData && navigator.userAgentData.getHighEntropyValues) {{
+    navigator.userAgentData.getHighEntropyValues(["architecture"]).then((values) => {{
+      if (values.architecture === "arm") light("aarch64");
+      else if (values.architecture === "x86") light("x86_64");
+    }}).catch(() => {{}});
+  }}
+}})();
+</script>
 </body>
 </html>
 """
 
 
-def card(mod) -> str:
+# OpenReliant's builds, in the order the page lists them, by the name in each archive.
+BUILDS = [
+    ("windows-x86_64", "Windows"), ("windows-aarch64", "Windows on Arm"),
+    ("macos-aarch64", "macOS, Apple silicon"), ("macos-x86_64", "macOS, Intel"),
+    ("linux-x86_64", "Linux"), ("linux-aarch64", "Linux on Arm"),
+]
+
+
+def latest_openreliant() -> dict | None:
+    """OpenReliant's latest release: its version, page, date and archives; None where it can't be
+    read."""
+    try:
+        found = subprocess.run(
+            ["gh", "release", "view", "--repo", "OpenReliant/openreliant", "--json", "tagName,url,publishedAt,assets"],
+            check=True, capture_output=True, text=True,
+        ).stdout
+    except (OSError, subprocess.CalledProcessError):
+        return None
+    return json.loads(found)
+
+
+def version_tuple(text: str) -> tuple[int, ...]:
+    return tuple(int(part) for part in text.lstrip("v").split(".") if part.isdigit())
+
+
+def engine_panel(release: dict | None) -> str:
+    text = html.escape
+    if not release:
+        return ('<section class="engine"><h2>Get <span>OpenReliant</span></h2>'
+                '<p><a href="https://github.com/OpenReliant/openreliant/releases/latest">Download the latest release</a>.</p></section>')
+    archives = {asset["name"]: asset["url"] for asset in release["assets"]}
+    links = []
+    for key, label in BUILDS:
+        found = next((url for name, url in archives.items() if f"-{key}." in name), None)
+        if found:
+            links.append(f'<a class="build" data-build="{key}" href="{text(found)}">{text(label)}</a>')
+    return (f'<section class="engine"><h2>Get <span>OpenReliant {text(release["tagName"].lstrip("v"))}</span></h2>'
+            f'<p>The latest release, from {text(release["publishedAt"][:10])}. '
+            f'<a href="{text(release["url"])}">Release notes</a>. You also need your own copy of StarLancer.</p>'
+            f'<div class="builds">{"".join(links)}</div></section>')
+
+
+def card(mod, release: dict | None = None) -> str:
     text = html.escape
     picture = f'<img src="thumbs/{text(mod.id)}.png" alt="{text(mod.name)}">' if mod.thumbnail else '<img alt="">'
     badges = [f'<span class="badge version">Version {text(mod.version)}</span>' if mod.version else "",
               f'<span class="badge">by {text(mod.author)}</span>' if mod.author else "",
               f'<span class="badge">Needs OpenReliant {text(mod.needs)}</span>' if mod.needs else ""]
+    if mod.needs and release and version_tuple(release["tagName"]) < version_tuple(mod.needs):
+        badges.append(f'<span class="badge waiting">OpenReliant {text(mod.needs)} is coming soon</span>')
     licence = f'<a href="https://github.com/{REPOSITORY}/blob/main/mods/{text(mod.id)}/license.txt">Credits and licence</a>'
     if mod.released():
         download = (f'<a class="download" href="{text(mod.download())}">Download {text(mod.archive)}</a>'
@@ -135,11 +224,12 @@ def main() -> None:
     shutil.rmtree(SITE, ignore_errors=True)
     (SITE / "thumbs").mkdir(parents=True)
     mods = all_mods()
+    release = latest_openreliant()
     for mod in mods:
         if mod.thumbnail:
             shutil.copy(mod.thumbnail, SITE / "thumbs" / f"{mod.id}.png")
     updated = git("log", "-1", "--format=%cs")
-    page = PAGE.format(mods="\n".join(card(mod) for mod in mods), repository=REPOSITORY, updated=updated)
+    page = PAGE.format(engine=engine_panel(release), mods="\n".join(card(mod, release) for mod in mods), repository=REPOSITORY, updated=updated)
     (SITE / "index.html").write_text(page, encoding="utf-8")
     print(f"wrote {SITE / 'index.html'}: {len(mods)} mods")
 

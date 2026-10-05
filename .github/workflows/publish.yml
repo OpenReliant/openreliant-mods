@@ -7,6 +7,9 @@ name: Publish
 on:
   push:
     branches: [main]
+  # Once a day, the page alone, so that it shows OpenReliant's latest release.
+  schedule:
+    - cron: "17 5 * * *"
   workflow_dispatch:
 
 permissions:
@@ -20,6 +23,7 @@ concurrency:
 
 jobs:
   release:
+    if: github.event_name != 'schedule'
     runs-on: ubuntu-latest
     steps:
       # The tags, to tell which versions are released and what changed since the last.
@@ -35,6 +39,7 @@ jobs:
 
   pages:
     needs: release
+    if: always() && needs.release.result != 'failure' && needs.release.result != 'cancelled'
     runs-on: ubuntu-latest
     environment:
       name: github-pages
@@ -44,6 +49,8 @@ jobs:
         with:
           fetch-depth: 0
       - run: python3 .github/scripts/site.py
+        env:
+          GH_TOKEN: ${{ github.token }}
       - uses: actions/configure-pages@v5
       - uses: actions/upload-pages-artifact@v3
         with:

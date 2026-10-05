@@ -18,3 +18,5 @@ jobs:
         uses: ./.github/actions/sltool
       - run: python3 .github/scripts/release.py --dry-run
       - run: python3 .github/scripts/site.py
+        env:
+          GH_TOKEN: ${{ github.token }}
