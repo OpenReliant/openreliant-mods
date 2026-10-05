@@ -19,14 +19,20 @@ under [CC-BY-NC-4.0](http://creativecommons.org/licenses/by-nc/4.0/); see the mo
 
 ## Building
 
-With OpenReliant's `sltool`, Python 3 and ImageMagick 7:
+With OpenReliant's `sltool`, Python 3, ImageMagick 7 and Node.js, for
+[glTF Transform](https://gltf-transform.dev):
 
 ```bash
 cd worn && python3 make.py && cp hull_color.png hull_mr.png hull_normal.png ../textures/ && cd ..
-sltool shp from-gltf viper.gltf ../../mods/viper/viper.shp
+npx @gltf-transform/cli weld viper.gltf welded.glb
+npx @gltf-transform/cli simplify welded.glb viper.glb --ratio 0.3 --error 0.002
+sltool shp from-gltf viper.glb ../../mods/viper/viper.shp
 sltool shp obj ../../mods/viper/viper.shp viper.obj
 python3 hud.py viper.obj ../../mods/viper scem icon wire
 ```
 
-`from-gltf` writes the model's textures, `viper_0.png` to `viper_7.png` with their maps, beside the
-model. `make.py` takes a minute and leaves its working pictures in `worn`.
+- `make.py` takes a minute and leaves its working pictures in `worn`.
+- `weld` and `simplify` halve the model's triangles with meshoptimizer, from about 54,000 to about
+  24,000, moving no surface by more than 0.2% of the model's radius.
+- `from-gltf` writes the model's textures, `viper_0.png` to `viper_7.png` with their maps, beside the
+  model.

@@ -14,9 +14,10 @@ Changes from the original model, by OpenReliant:
 
 - Converted to StarLancer's .SHP format with sltool shp from-gltf, scaled and turned to the game's
   axes, with engine glows, gun muzzles, missile hardpoints, an eject point and jump points added.
+- Simplified from about 54,000 triangles to about 24,000 with meshoptimizer.
 - The hull's texture enlarged four times, its stripes made a deeper red, and wear added: grime,
-  exhaust streaks, chipped paint, scratches and panel seams with rivets, with a roughness and
-  metalness map and a normal map to match.
+  exhaust streaks, scuffs, faded and chipped paint, chipped lettering, scratches, and panel seams,
+  hatches and vents with rivets, with a roughness and metalness map and a normal map to match.
 - The other materials made less shiny.
 - The flight display's pictures of the ship (its schematic, its hit markers, the gunnery display's
   wire frame and the wing's icon) drawn from the model.

@@ -4,3 +4,4 @@ sources/*/worn/*
 sources/*/tmp.rgba
 sources/*/*.obj
 sources/*/*.ppm
+sources/*/*.glb
