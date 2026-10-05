@@ -44,8 +44,9 @@ says how mods work.
 A mod's version is the `Version` in its `mod.ini`. To release it, raise the version and push to
 `main`. The Publish workflow then:
 
-1. packs the mod's folder into `<mod>.hog` with `sltool hog pack --checksum`, using the `sltool` of
-   OpenReliant's latest release, with `<mod>.hog.sha256` beside it;
+1. packs the mod's folder into `<mod>.hog` with `sltool hog pack --checksum`, with
+   `<mod>.hog.sha256` beside it. `sltool` is built from OpenReliant's `main` until a release can
+   pack every mod here; the `source` of `.github/actions/sltool` then switches to `release`;
 2. publishes the release `<mod>-v<version>`, such as `viper-v1.0`, with both files attached and
    the commits that changed the mod since its last release as its notes;
 3. rebuilds the [index page](https://openreliant.github.io/openreliant-mods/).

@@ -1,9 +1,16 @@
 name: sltool
-description: Puts the sltool of OpenReliant's latest release on the PATH.
+description: Puts OpenReliant's sltool on the PATH, built from a branch of OpenReliant or taken from its latest release.
+inputs:
+  source:
+    description: >-
+      Where sltool comes from: "release" for the latest release's, or the name of a branch or tag
+      of OpenReliant to build it from. Main until a release can pack every mod here.
+    default: main
 runs:
   using: composite
   steps:
-    - shell: bash
+    - if: inputs.source == 'release'
+      shell: bash
       env:
         GH_TOKEN: ${{ github.token }}
       run: |
@@ -11,3 +18,21 @@ runs:
         gh release download --repo OpenReliant/openreliant --pattern '*-linux-x86_64.tar.gz' --dir "$RUNNER_TEMP/openreliant"
         tar xzf "$RUNNER_TEMP"/openreliant/*.tar.gz -C "$RUNNER_TEMP/openreliant"
         dirname "$(find "$RUNNER_TEMP/openreliant" -name sltool -type f)" >> "$GITHUB_PATH"
+    - if: inputs.source != 'release'
+      uses: actions/checkout@v5
+      with:
+        repository: OpenReliant/openreliant
+        ref: ${{ inputs.source }}
+        path: .openreliant
+    - if: inputs.source != 'release'
+      uses: mlugg/setup-zig@v2
+      with:
+        version: 0.16.0
+    - if: inputs.source != 'release'
+      shell: bash
+      working-directory: .openreliant
+      run: |
+        zig build -Doptimize=ReleaseSafe
+        echo "$PWD/zig-out/bin" >> "$GITHUB_PATH"
+    - shell: bash
+      run: sltool --version
