@@ -32,7 +32,7 @@ runs:
       shell: bash
       working-directory: .openreliant
       run: |
-        zig build -Doptimize=ReleaseSafe
+        zig build sltool -Doptimize=ReleaseSafe
         echo "$PWD/zig-out/bin" >> "$GITHUB_PATH"
     - shell: bash
       run: sltool --version
