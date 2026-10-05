@@ -26,10 +26,14 @@ PAGE = """<!doctype html>
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@500;600;700&display=swap" rel="stylesheet">
 <style>
+/* Newtown, by Roger White, from Roger's Fonts: the face OpenReliant draws the game's menus in, from
+   the OpenReliant website on the same host. */
+@font-face {{ font-family: "Newtown"; src: url("/openreliant/fonts/Newtown.ttf") format("truetype"); font-display: swap; }}
 :root {{
   --bg: #07080c; --card: #10131b; --card-edge: #232938; --text: #e8eaf0; --muted: #9aa3b5;
   --accent: #f08a2c; --accent-dim: #8a4a14; --red: #c8352a;
   --display: "Rajdhani", system-ui, sans-serif;
+  --title: "Newtown", "Rajdhani", system-ui, sans-serif;
   /* The display's corner brackets, as round the wing's icons: four short orange corners. */
   --brackets:
     linear-gradient(var(--accent), var(--accent)) top left / 18px 2px,
@@ -61,14 +65,13 @@ body {{
 }}
 main {{ max-width: 1000px; margin: 0 auto; padding: 0 16px 64px; }}
 nav {{ display: flex; justify-content: space-between; align-items: center; padding: 20px 0 36px; font-family: var(--display); font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; }}
-nav .brand {{ color: var(--text); text-decoration: none; font-weight: 700; font-size: 20px; }}
+nav .brand {{ color: var(--text); text-decoration: none; font-family: var(--title); font-weight: normal; font-size: 19px; letter-spacing: 0.03em; }}
 nav .brand span, nav .links a.current {{ color: var(--accent); }}
 nav .links a {{ color: var(--muted); text-decoration: none; margin-left: 22px; font-size: 15px; }}
 nav .links a:hover {{ color: var(--accent); }}
 @media (max-width: 520px) {{ nav .links a:not(.keep) {{ display: none; }} }}
 header {{ margin-bottom: 36px; }}
-.eyebrow {{ font-family: var(--display); color: var(--accent); letter-spacing: 0.3em; font-size: 15px; font-weight: 700; text-transform: uppercase; }}
-h1 {{ font-family: var(--display); margin: 2px 0 10px; font-size: clamp(34px, 7vw, 54px); line-height: 1; letter-spacing: 0.06em; text-transform: uppercase; font-weight: 700; }}
+h1 {{ font-family: var(--title); margin: 2px 0 10px; font-size: clamp(34px, 7vw, 54px); line-height: 1; letter-spacing: 0.02em; text-transform: uppercase; font-weight: normal; }}
 header p {{ margin: 0; max-width: 640px; color: var(--muted); font-size: 17px; }}
 a {{ color: var(--accent); text-underline-offset: 2px; }}
 .mod {{
@@ -78,7 +81,7 @@ a {{ color: var(--accent); text-underline-offset: 2px; }}
 }}
 .shot {{ position: relative; }}
 .shot img {{ display: block; width: 100%; aspect-ratio: 4 / 3; object-fit: cover; background: #000; clip-path: var(--cut); }}
-.mod h2 {{ font-family: var(--display); margin: 0 0 8px; font-size: 30px; line-height: 1.1; letter-spacing: 0.05em; text-transform: uppercase; font-weight: 700; }}
+.mod h2 {{ font-family: var(--title); margin: 0 0 8px; font-size: 28px; line-height: 1.1; letter-spacing: 0.03em; text-transform: uppercase; font-weight: normal; }}
 .badges {{ display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 14px; }}
 .badge {{ font-family: var(--display); font-weight: 600; font-size: 14px; letter-spacing: 0.06em; text-transform: uppercase; padding: 2px 10px; border: 1px solid var(--card-edge); color: var(--muted); background: #0b0e15; }}
 .badge.version {{ color: var(--accent); border-color: var(--accent-dim); }}
@@ -96,7 +99,7 @@ a {{ color: var(--accent); text-underline-offset: 2px; }}
   margin-bottom: 30px; padding: 20px 22px; background: var(--brackets), #0e111a;
   background-repeat: no-repeat; box-shadow: inset 0 0 0 1px var(--card-edge);
 }}
-.engine h2 {{ font-family: var(--display); margin: 0 0 4px; font-size: 22px; letter-spacing: 0.08em; text-transform: uppercase; }}
+.engine h2 {{ font-family: var(--title); margin: 0 0 4px; font-size: 22px; letter-spacing: 0.04em; text-transform: uppercase; font-weight: normal; }}
 .engine h2 span {{ color: var(--accent); }}
 .engine p {{ margin: 0 0 14px; color: var(--muted); font-size: 14px; }}
 .builds {{ display: flex; flex-wrap: wrap; gap: 10px; }}
@@ -112,7 +115,7 @@ a {{ color: var(--accent); text-underline-offset: 2px; }}
 .install {{
   margin-top: 36px; padding: 18px 22px; border-left: 3px solid var(--accent); background: #0e111a; color: #cfd3dd;
 }}
-.install h3 {{ font-family: var(--display); margin: 0 0 6px; font-size: 18px; text-transform: uppercase; letter-spacing: 0.14em; color: var(--accent); }}
+.install h3 {{ font-family: var(--title); margin: 0 0 6px; font-size: 17px; text-transform: uppercase; letter-spacing: 0.04em; font-weight: normal; color: var(--accent); }}
 .install p {{ margin: 0; }}
 code {{ background: #1a1f2c; padding: 1px 6px; border-radius: 4px; font-size: 14px; }}
 footer {{ color: var(--muted); font-size: 14px; margin-top: 28px; }}
@@ -131,7 +134,6 @@ footer {{ color: var(--muted); font-size: 14px; margin-top: 28px; }}
 </div>
 </nav>
 <header>
-<div class="eyebrow">OpenReliant</div>
 <h1>Mods</h1>
 <p>Mods for <a href="https://openreliant.github.io/openreliant/">OpenReliant</a>, checked to work and to be free to share. You need OpenReliant and your own copy of StarLancer.</p>
 </header>
@@ -142,7 +144,7 @@ footer {{ color: var(--muted); font-size: 14px; margin-top: 28px; }}
 <p>Download its <code>.hog</code> file and its <code>.hog.sha256</code> file, put both in the <code>mods</code> folder of your game folder, next to <code>resource.hog</code>, and turn the mod on in OpenReliant's mods screen. OpenReliant checks the archive against its checksum as it loads it.</p>
 </section>
 <footer>
-<p><a href="https://github.com/{repository}">The mods' sources</a>, with each mod's credits and licence. Updated {updated}.</p>
+<p><a href="https://github.com/{repository}">The mods' sources</a>, with each mod's credits and licence. Updated {updated}. Headings are set in Newtown, by Roger White, from Roger's Fonts.</p>
 </footer>
 </main>
 <script>
