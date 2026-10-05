@@ -1,0 +1,27 @@
+Viper Mk II, a mod for OpenReliant
+==================================
+
+This work is based on "Battlestar Galactica Viper Mark 2"
+(https://sketchfab.com/3d-models/battlestar-galactica-viper-mark-2-1bf9872a1e8d4b39a259e14a7015a0a2)
+by LocoPixel (https://sketchfab.com/locopixel), licensed under CC-BY-NC-4.0
+(http://creativecommons.org/licenses/by-nc/4.0/).
+
+The model, its textures and every picture made from it (viper.shp, viper_*.png, viperscem_*.png,
+viperwire_000.png and vipericon_000.png) are shared under the same licence, CC-BY-NC-4.0: you may
+share and adapt them for non-commercial use, crediting LocoPixel as above.
+
+Changes from the original model, by OpenReliant:
+
+- Converted to StarLancer's .SHP format with sltool shp from-gltf, scaled and turned to the game's
+  axes, with engine glows, gun muzzles, missile hardpoints, an eject point and jump points added.
+- The hull's texture enlarged four times, its stripes made a deeper red, and wear added: grime,
+  exhaust streaks, chipped paint, scratches and panel seams with rivets, with a roughness and
+  metalness map and a normal map to match.
+- The other materials made less shiny.
+- The flight display's pictures of the ship (its schematic, its hit markers, the gunnery display's
+  wire frame and the wing's icon) drawn from the model.
+
+mod.ini and records.luau are OpenReliant's, under the Mozilla Public License 2.0.
+
+Battlestar Galactica and the Viper are trademarks of their owners. This is a non-commercial fan
+work, not endorsed by them.

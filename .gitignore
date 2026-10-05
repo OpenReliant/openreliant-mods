@@ -1,0 +1,6 @@
+# Working files of the build scripts.
+sources/*/worn/*
+!sources/*/worn/*.py
+sources/*/tmp.rgba
+sources/*/*.obj
+sources/*/*.ppm
