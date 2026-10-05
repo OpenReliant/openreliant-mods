@@ -23,7 +23,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       # The tags, to tell which versions are released and what changed since the last.
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
         with:
           fetch-depth: 0
       - name: Get sltool
@@ -40,7 +40,7 @@ jobs:
       name: github-pages
       url: ${{ steps.deploy.outputs.page_url }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
         with:
           fetch-depth: 0
       - run: python3 .github/scripts/site.py
