@@ -1,0 +1,20 @@
+# Checks that every mod packs, and that the index page builds, before a change reaches main.
+name: Check
+
+on:
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Get sltool
+        uses: ./.github/actions/sltool
+      - run: python3 .github/scripts/release.py --dry-run
+      - run: python3 .github/scripts/site.py

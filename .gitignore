@@ -5,3 +5,6 @@ sources/*/tmp.rgba
 sources/*/*.obj
 sources/*/*.ppm
 sources/*/*.glb
+dist/
+site/
+__pycache__/

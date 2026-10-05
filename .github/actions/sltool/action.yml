@@ -1,0 +1,13 @@
+name: sltool
+description: Puts the sltool of OpenReliant's latest release on the PATH.
+runs:
+  using: composite
+  steps:
+    - shell: bash
+      env:
+        GH_TOKEN: ${{ github.token }}
+      run: |
+        mkdir -p "$RUNNER_TEMP/openreliant"
+        gh release download --repo OpenReliant/openreliant --pattern '*-linux-x86_64.tar.gz' --dir "$RUNNER_TEMP/openreliant"
+        tar xzf "$RUNNER_TEMP"/openreliant/*.tar.gz -C "$RUNNER_TEMP/openreliant"
+        dirname "$(find "$RUNNER_TEMP/openreliant" -name sltool -type f)" >> "$GITHUB_PATH"

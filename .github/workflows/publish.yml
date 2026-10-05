@@ -1,0 +1,52 @@
+# Releases each mod whose mod.ini gives a version that has no release yet, then rebuilds the index
+# page on GitHub Pages. To release a mod, raise the Version in its mod.ini and push to main: the
+# mod is packed into <mod>.hog with sltool, with <mod>.hog.sha256 beside it, and published as the
+# release <mod>-v<version> with both attached. The page lists every mod with its latest download.
+name: Publish
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pages: write
+  id-token: write
+
+concurrency:
+  group: publish
+  cancel-in-progress: false
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      # The tags, to tell which versions are released and what changed since the last.
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Get sltool
+        uses: ./.github/actions/sltool
+      - name: Release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: python3 .github/scripts/release.py
+
+  pages:
+    needs: release
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deploy.outputs.page_url }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - run: python3 .github/scripts/site.py
+      - uses: actions/configure-pages@v5
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: site
+      - id: deploy
+        uses: actions/deploy-pages@v4
