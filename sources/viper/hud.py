@@ -78,29 +78,33 @@ def shade(i, light=(0.35,0.75,-0.55)):
     n=N[i]; l=math.sqrt(sum(t*t for t in light)); L=[t/l for t in light]
     return abs(sum(n[k]*L[k] for k in range(3)))
 
-# Mirage's frames: shape 0 of the schematic 56x46 at (7,2); quadrants left 25x16 at (7,23), right
-# 27x20 at (36,21), fore 12x21 at (30,2), aft 43x22 at (11,26). The pictures are four times as
-# large, rendered at twice that and filtered down.
+# The Predator's frames (PREDSCEM.SPR), the template of a ship type without a base: shape 0 of
+# the schematic 42x47 at (14,1); quadrants left 15x20 at (17,15), right 20x28 at (36,11), fore
+# 36x22 at (20,1), aft 39x21 at (14,27). The pictures are four times as large, rendered at twice
+# that and filtered down.
 UP=4; SS=2; K=UP*SS
+FRAME=(14,1,42,47)
+QUADRANTS=[('left',(17,15,15,20)),('right',(36,11,20,28)),('fore',(20,1,36,22)),('aft',(14,27,39,21))]
 def schematic():
-    W,H=56*K,46*K
+    fx,fy,fw,fh=FRAME
+    W,H=fw*K,fh*K
     S=fit(project(58),W,H,2*K)
     def green(i):
         t=0.25+0.75*shade(i)
         return (int(40*t),int(255*t),int(60*t),255)
     Z,C=raster(S,W,H,green)
     save(C,W,H,'viperscem_000.png',SS)
-    for number,(q,(rx,ry,rw,rh)) in enumerate([('left',(7,23,25,16)),('right',(36,21,27,20)),('fore',(30,2,12,21)),('aft',(11,26,43,22))],1):
+    for number,(q,(rx,ry,rw,rh)) in enumerate(QUADRANTS,1):
         def hit(i):
             t=0.55+0.45*shade(i)
             return (255,int(150*t),int(60*t),255)
         Z,C=raster(S,W,H,hit,keep=lambda i,q=q: Q[i]==q)
-        x0,y0=(rx-7)*K,(ry-2)*K
+        x0,y0=(rx-fx)*K,(ry-fy)*K
         crop=[[ (C[y][x] if 0<=y<H and 0<=x<W else None) for x in range(x0,x0+rw*K)] for y in range(y0,y0+rh*K)]
         save(crop,rw*K,rh*K,f'viperscem_{number:03d}.png',SS)
 
 def icon():
-    # Mirage's wing icon, 34x38: brackets round the ship in orange.
+    # The wing icon, 34x38 for every fighter: brackets round the ship in orange.
     W,H=34*K,38*K
     S=fit(project(58),W,H,5*K)
     def tan(i):
@@ -116,8 +120,9 @@ def icon():
     save(C,W,H,'vipericon_000.png',SS)
 
 def wire():
-    # Mirage's gunnery wire frame, 100x107: the hull's feature edges, red, the hidden ones dim.
-    W,H=100*K,107*K
+    # The gunnery wire frame in the Predator's rectangle, 92x108, which a ship type without a base
+    # is drawn over: the hull's feature edges, red, the hidden ones dim.
+    W,H=92*K,108*K
     S=fit(project(58),W,H,4*K)
     Z,_=raster(S,W,H,lambda i:(0,0,0,255))
     edges={}
