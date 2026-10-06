@@ -24,15 +24,22 @@ runs:
         repository: OpenReliant/openreliant
         ref: ${{ inputs.source }}
         path: .openreliant
+    # The Zig version the checkout's build.zig.zon asks for, so a Zig upgrade on OpenReliant's
+    # side needs no change here.
+    - if: inputs.source != 'release'
+      id: zig
+      shell: bash
+      working-directory: .openreliant
+      run: echo "version=$(sed -n 's/.*minimum_zig_version = "\(.*\)".*/\1/p' build.zig.zon)" >> "$GITHUB_OUTPUT"
     - if: inputs.source != 'release'
       uses: mlugg/setup-zig@v2
       with:
-        version: 0.16.0
+        version: ${{ steps.zig.outputs.version }}
     - if: inputs.source != 'release'
       shell: bash
       working-directory: .openreliant
       run: |
-        zig build sltool -Doptimize=ReleaseSafe
+        zig build sltool --release=safe
         echo "$PWD/zig-out/bin" >> "$GITHUB_PATH"
     - shell: bash
       run: sltool --version
