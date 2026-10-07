@@ -371,8 +371,8 @@ def card(mod, by_path: dict[str, Category], release: dict | None, updated: str) 
         badges.append(f'<span class="badge waiting">OpenReliant {text(mod.needs)} is coming soon</span>')
     label, address = mod.credits()
     licence = f'<a href="{text(address)}">{text(label)}</a>'
-    # For a mod kept in another repository, its folder there at the pinned commit.
-    if mod.source and label != "Source":
+    # For an artist's mod, its folder in their repository at the pinned commit.
+    if mod.artist and label != "Source":
         licence += f'<a href="{text(mod.source_page())}">Source</a>'
     # The mod's own page, where its manifest or its artist gives one other than this collection.
     if mod.url and REPOSITORY not in mod.url:

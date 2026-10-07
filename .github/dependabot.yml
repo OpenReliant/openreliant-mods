@@ -1,0 +1,11 @@
+# Opens a pull request that moves an artist's submodule under external/ to their latest commit,
+# each day they have new commits. The Check workflow checks it, and once it passes, the
+# Dependabot workflow merges it and publishes.
+version: 2
+updates:
+  - package-ecosystem: gitsubmodule
+    directory: /
+    schedule:
+      interval: daily
+    commit-message:
+      prefix: chore

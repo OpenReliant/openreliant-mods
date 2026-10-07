@@ -13,14 +13,13 @@ each from its latest release, and see [the latest updates](https://openreliant.g
 
 ## Mods
 
-| Mod | Category | What it adds | Needs | Licence |
-|---|---|---|---|---|
-| [Instructor, Shut Up](mods/gameplay/instructor-shut-up) | Gameplay | Instant Action truly becomes Instant | OpenReliant 0.7 | MPL-2.0 |
-| [Coyote Worn](mods/ships/fighters/alliance/coyote-worn) | Ships / Fighters / Alliance | KonCyptFysh's worn restoration of the Coyote, with material maps | OpenReliant 0.6.3 | His restoration work CC-BY-NC-SA-4.0, by KonCyptFysh ([credits](https://github.com/KonCyptFysh/OpenReliant-Art-Packs/blob/main/Alliance%20Fighters/Coyote/mods/30-coyote-worn-v4/license.txt)) |
-| [Predator Worn](mods/ships/fighters/alliance/predator-worn) | Ships / Fighters / Alliance | KonCyptFysh's worn restoration of the Predator, with material maps | OpenReliant 0.6.3 | His restoration work CC-BY-NC-SA-4.0, by KonCyptFysh ([credits](https://github.com/KonCyptFysh/OpenReliant-Art-Packs/blob/main/Alliance%20Fighters/Predator/mods/40-predator-worn-v14/license.txt)) |
-| [Reaper Worn](mods/ships/fighters/alliance/reaper-worn) | Ships / Fighters / Alliance | KonCyptFysh's worn restoration of the Reaper, with material maps | OpenReliant 0.6.3 | His restoration work CC-BY-NC-SA-4.0, by KonCyptFysh ([credits](https://github.com/KonCyptFysh/OpenReliant-Art-Packs/blob/main/Alliance%20Fighters/Reaper/mods/50-reaper-worn-v3/license.txt)) |
-| [Wolverine Worn](mods/ships/fighters/alliance/wolverine-worn) | Ships / Fighters / Alliance | KonCyptFysh's worn restoration of the Wolverine, with material maps | OpenReliant 0.6.3 | His restoration work CC-BY-NC-SA-4.0, by KonCyptFysh ([credits](https://github.com/KonCyptFysh/OpenReliant-Art-Packs/blob/main/Alliance%20Fighters/Wolverine/mods/60-wolverine-worn-v1/license.txt)) |
-| [Viper Mk II](mods/ships/fighters/viper) | Ships / Fighters | Fly the Viper Mk II from Battlestar Galactica: fast and agile, with two kinetic guns, light shields and a strong hull | OpenReliant 0.7 | Model and pictures CC-BY-NC-4.0, by LocoPixel ([credits](mods/ships/fighters/viper/license.txt)) |
+The site lists every mod, by category. They come from two places:
+
+- [`mods/`](mods), a folder for each category, holds the mods made for the collection, such as the
+  Viper Mk II in [`mods/ships/fighters/viper`](mods/ships/fighters/viper).
+- [`external/`](external) holds the repositories of artists who keep their mods themselves, such as
+  KonCyptFysh's [art packs](https://koncyptfysh.github.io/OpenReliant-Art-Packs/) of the Alliance's
+  fighters ([Artists' repositories](#artists-repositories)).
 
 ## Installing a mod
 
@@ -31,8 +30,8 @@ screen. OpenReliant checks the archive against its checksum as it loads it.
 To try the latest changes before they're released, copy the mod's own folder into the same `mods`
 folder instead, keeping its name: `mods/ships/fighters/viper` becomes `<game>/mods/viper`. The name
 matters: the game and the mod's scripts know what a mod adds by it, such as `viper:viper` for the
-Viper, and `viper.hog` gives the same names. For a mod kept in another repository, copy its folder
-from there, renamed as the mod is called here: `Alliance Fighters/Coyote/mods/30-coyote-worn-v4`
+Viper, and `viper.hog` gives the same names. For an artist's mod, copy its folder from their
+repository, renamed as the collection calls the mod: `Alliance Fighters/Coyote/mods/30-coyote-worn-v4`
 becomes `<game>/mods/coyote-worn`.
 
 ```text
@@ -61,40 +60,77 @@ in it as the paragraph after, and links to its own categories in the order the s
 category with no mods yet still shows on the site, with none in it. To add a category, add a folder
 with its `README.md`, and link to it from the README of the category it's in.
 
-## Mods kept in other repositories
+## Artists' repositories
 
-An artist can keep their mods in their own repository, and the collection packs and releases them
-from there. The repository is a submodule under `external/`, pinned to a commit:
+An artist can keep their mods in a repository of their own, and the collection picks up every mod
+there, packs it and releases it, without a copy of its files here.
+
+### What the repository holds
+
+- Each mod is a folder with a `mod.ini`, as OpenReliant's modding guide describes, a `mod.png`
+  thumbnail, and its licence in a `license.txt` or `LICENSE` file. A licence or credits file at
+  the top of the repository counts for every mod without one of its own.
+- The mods' folders sit under top folders that group them, such as `Alliance Fighters`. Below that,
+  any layout works.
+- A mod's folder can carry an order number and a version in its name, as `30-coyote-worn-v4`. The
+  collection names the mod without them, `coyote-worn`, so that its name stays the same from one
+  version to the next. Where two folders give one name, the one with the higher `Version` is the
+  mod.
+- Big files can be in Git LFS. The collection fetches only the mods' own files.
+
+### The catalogue
+
+A repository that holds mods which aren't ready yet keeps a catalogue: a JSON file that lists its
+mods and marks the ones that are out. The collection picks up only those. It reads two fields of
+each entry of `assets`, and the rest of the file is the artist's own:
+
+```json
+{
+  "assets": [
+    { "folder": "Alliance Fighters/Coyote", "status": "available" },
+    { "folder": "Alliance Fighters/Patriot", "status": "coming-soon" }
+  ]
+}
+```
+
+- `folder`: the folder of the repository that holds the mod's folder.
+- `status`: `available` for a mod that's out. Any other status leaves the mod out until it changes.
+
+Without a catalogue, every mod of the repository is picked up.
+
+### Adding an artist
+
+The artist's repository goes in as a submodule under `external/`, pinned to a commit:
 
 ```sh
 git submodule add https://github.com/<artist>/<repository>.git external/<artist>
 ```
 
-`external/<artist>.ini` gives the artist's name and web page, for the mods whose `mod.ini` leaves
-them out:
+`external/<artist>.ini` beside it says how the repository fits the collection: the artist's name
+and web page, for the mods whose `mod.ini` leaves out `Author` and `Url`; the catalogue, if there is
+one; and the collection's category for each top folder:
 
 ```ini
 [Artist]
 Name=KonCyptFysh
 Url=https://koncyptfysh.github.io/OpenReliant-Art-Packs/
+Catalog=catalog.json
+
+[Categories]
+Alliance Fighters=ships/fighters/alliance
+Coalition Fighters=ships/fighters/coalition
 ```
 
-Each mod gets a folder in its category, named as the mod is to be called here, holding a
-`source.ini` in place of the mod's files:
+The Check workflow fails for a mod under a top folder with no category, so that a new kind of mod
+gets a place before it's released.
 
-```ini
-[Source]
-Submodule=external/koncyptfysh
-Folder=Alliance Fighters/Coyote/mods
-```
+### Updates
 
-`Folder` is the folder of the artist's repository that holds the mod's own folder, whatever that's
-called, so the mod's folder there can carry its version in its name. Where it holds more than one,
-the one with the highest `Version` is the mod. The card links to the artist's licence or credits
-file, from the mod's folder or the top of the repository, and to the mod's folder there.
-
-To release a new version, the artist raises the `Version` in the mod's `mod.ini` in their
-repository, and opens a pull request here that moves the pin:
+Each day, Dependabot opens a pull request that moves each artist's pin to their latest commit, if
+they have new commits. Once the Check workflow passes on it, the Dependabot workflow merges it and
+publishes: a mod that's new, or whose `Version` went up, is released, and the site shows it. A
+pull request from Dependabot that changes anything besides the pins waits for review. The artist
+can also open a pull request that moves the pin themselves:
 
 ```sh
 git -C external/<artist> pull origin main
@@ -102,8 +138,9 @@ git add external/<artist>
 ```
 
 The workflows fetch the Git LFS files of the mods' own folders and no others, and cache them by the
-pins, so that each pin costs the artist's LFS bandwidth once. To work with the mods locally, check
-out the submodules without their LFS files, then fetch the same files:
+pins, so that each pin costs the artist's LFS bandwidth once. The release notes list the artist's
+commits to the mod since its last release. To work with the mods locally, check out the submodules
+without their LFS files, then fetch the same files:
 
 ```sh
 GIT_LFS_SKIP_SMUDGE=1 git submodule update --init

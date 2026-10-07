@@ -37,24 +37,25 @@ def pin_at(tag: str, submodule: str) -> str | None:
 
 
 def changes(mod, earlier: str | None) -> str:
-    """What changed in the mod since its release `earlier`, as a list: the commits here that touch
-    its folder, and for a mod kept in another repository, the commits there that touch its folder
-    between the two pins."""
+    """What changed in the mod since its release `earlier`, as a list: the commits that touch its
+    folder, here, or for an artist's mod, in their repository between the two pins."""
+    if mod.artist:
+        before = pin_at(earlier, mod.artist.submodule) if earlier else None
+        if before is None:
+            return ""
+        return git("-C", str(mod.artist.root), "log", "--format=- %s", f"{before}..{mod.artist.commit()}", "--", mod.kept_in())
     since = [f"{earlier}..HEAD"] if earlier else []
-    listed = git("log", "--format=- %s", *since, "--", mod.path, f"sources/{mod.id}").splitlines()
-    if mod.source and earlier and (before := pin_at(earlier, mod.source.submodule)):
-        listed += git("-C", str(mod.source.root), "log", "--format=- %s", f"{before}..{mod.source.commit()}", "--", mod.source.folder).splitlines()
-    return "\n".join(listed)
+    return git("log", "--format=- %s", *since, "--", mod.path, f"sources/{mod.id}")
 
 
 def credits(mod) -> str:
-    """The notes' line for the mod's credits and licence, and for a mod kept in another repository,
-    where it's kept."""
-    if not mod.source:
+    """The notes' line for the mod's credits and licence, and for an artist's mod, where it's
+    kept."""
+    if not mod.artist:
         return f"Credits and licence: [license.txt](https://github.com/OpenReliant/openreliant-mods/blob/{mod.tag}/{mod.path}/license.txt)."
     label, address = mod.credits()
     name = urllib.parse.unquote(address.rsplit("/", 1)[-1])
-    kept = f"From {mod.author}'s repository: [{mod.source.folder}]({mod.source_page()})."
+    kept = f"From {mod.author}'s repository: [{mod.kept_in()}]({mod.source_page()})."
     return kept if label == "Source" else f"{kept} Credits and licence: [{name}]({address})."
 
 
@@ -78,7 +79,7 @@ def notes(mod) -> str:
         "",
         "## Changes" if not earlier else f"## Changes since {earlier[0]}",
         "",
-        changed or "- First release.",
+        changed or ("- First release." if not earlier else "- No changes to its files."),
     ]
     return "\n".join(line for line in lines if line is not None)
 

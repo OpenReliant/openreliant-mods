@@ -1,0 +1,37 @@
+# Merges Dependabot's pull requests that move the artists' pins under external/, once the Check
+# workflow has passed on them, then publishes: a merge by this workflow doesn't start Publish by
+# itself. A pull request that changes anything but the pins is left for review.
+name: Dependabot
+
+on:
+  workflow_run:
+    workflows: [Check]
+    types: [completed]
+
+permissions:
+  contents: write
+  pull-requests: write
+  actions: write
+
+jobs:
+  merge:
+    if: >-
+      github.event.workflow_run.conclusion == 'success' &&
+      github.event.workflow_run.actor.login == 'dependabot[bot]' &&
+      startsWith(github.event.workflow_run.head_branch, 'dependabot/submodules/')
+    runs-on: ubuntu-latest
+    env:
+      GH_TOKEN: ${{ github.token }}
+      GH_REPO: ${{ github.repository }}
+      BRANCH: ${{ github.event.workflow_run.head_branch }}
+    steps:
+      - name: Merge and publish
+        run: |
+          number=$(gh pr list --head "$BRANCH" --state open --json number --jq '.[0].number')
+          [ -n "$number" ] || { echo "no open pull request for $BRANCH"; exit 0; }
+          if gh pr diff "$number" --name-only | grep -v '^external/'; then
+            echo "pull request $number changes more than the pins; leaving it for review"
+            exit 0
+          fi
+          gh pr merge "$number" --merge
+          gh workflow run publish.yml --ref main
