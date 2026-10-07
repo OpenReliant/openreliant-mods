@@ -14,7 +14,7 @@ import shutil
 import subprocess
 import sys
 
-from mods import ROOT, REPOSITORY, Category, all_categories, git, problems, tree
+from mods import ROOT, REPOSITORY, Category, all_categories, git, problems, tree, version_tuple
 
 SITE = ROOT / "site"
 
@@ -349,10 +349,6 @@ def changes(notes: str) -> list[str]:
     return listed
 
 
-def version_tuple(text: str) -> tuple[int, ...]:
-    return tuple(int(part) for part in text.lstrip("v").split(".") if part.isdigit())
-
-
 def where(category: Category, by_path: dict[str, Category], base: str) -> str:
     """The category's place, as links to it and the categories it's in: Ships / Fighters."""
     trail = []
@@ -373,8 +369,12 @@ def card(mod, by_path: dict[str, Category], release: dict | None, updated: str) 
               f'<span class="badge">Updated {text(updated[:10])}</span>' if updated else ""]
     if mod.needs and release and version_tuple(release["tagName"]) < version_tuple(mod.needs):
         badges.append(f'<span class="badge waiting">OpenReliant {text(mod.needs)} is coming soon</span>')
-    licence = f'<a href="https://github.com/{REPOSITORY}/blob/main/{text(mod.path)}/license.txt">Credits and licence</a>'
-    # The mod's own page, where its manifest gives one other than this collection.
+    label, address = mod.credits()
+    licence = f'<a href="{text(address)}">{text(label)}</a>'
+    # For a mod kept in another repository, its folder there at the pinned commit.
+    if mod.source and label != "Source":
+        licence += f'<a href="{text(mod.source_page())}">Source</a>'
+    # The mod's own page, where its manifest or its artist gives one other than this collection.
     if mod.url and REPOSITORY not in mod.url:
         licence += f'<a href="{text(mod.url)}">Website</a>'
     if mod.released():

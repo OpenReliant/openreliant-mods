@@ -1,0 +1,35 @@
+name: external
+description: >-
+  Checks out the submodules under external/, the artists' repositories that some mods are kept in,
+  with the Git LFS files those mods need and no others, cached by the submodules' pins so that each
+  artist's LFS bandwidth is spent once for each pin.
+inputs:
+  files:
+    description: >-
+      "packs" for every file of the mods kept there, to pack them, or "thumbnails" for their
+      mod.png alone, for the site.
+    default: packs
+runs:
+  using: composite
+  steps:
+    # The repositories at their pins, without their LFS files, which would be the whole of each
+    # repository's: the last step fetches the mods' own.
+    - shell: bash
+      env:
+        GIT_LFS_SKIP_SMUDGE: "1"
+      run: git submodule update --init
+    - id: pins
+      shell: bash
+      run: echo "key=$(git submodule status | sha256sum | cut -c1-16)" >> "$GITHUB_OUTPUT"
+    # The LFS files fetched for these pins, or for the last pins, which a new pin mostly shares.
+    - uses: actions/cache@v4
+      with:
+        path: .git/modules/external/*/lfs/objects
+        key: external-${{ inputs.files }}-${{ steps.pins.outputs.key }}
+        restore-keys: external-${{ inputs.files }}-
+    - shell: bash
+      run: |
+        python3 .github/scripts/mods.py lfs-includes --${{ inputs.files }} |
+          while IFS=$'\t' read -r submodule include; do
+            git -C "$submodule" lfs pull --include "$include"
+          done

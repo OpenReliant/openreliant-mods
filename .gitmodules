@@ -1,0 +1,3 @@
+[submodule "external/koncyptfysh"]
+	path = external/koncyptfysh
+	url = https://github.com/KonCyptFysh/OpenReliant-Art-Packs.git
