@@ -45,8 +45,8 @@ records.text[677] = "RONIN 1" -- was "Ego"
 records.text[1104] = "PIRATE" -- was "YAKOB SHUTTLE"
 
 -- The trial's faces: Tanaka, in Moose's place, and the Ronin pilots wear the Ronin wing's helmet.
-records.faces[4] = { talking = "Ronin_Plt", laughing = "Ronin_Plt", dying = "Ronin_Plt_D" }
-for _, pilot in { 85, 86, 87, 88, 108, 119, 172 } do
+records.faces.moose_volunteers = { talking = "Ronin_Plt", laughing = "Ronin_Plt", dying = "Ronin_Plt_D" }
+for _, pilot in { "frenchy", "silky", "mayday", "trigger", "worm", "ego", "bandit" } do
     records.faces[pilot] = { talking = "Ronin_Plt", dying = "Ronin_Plt_D" }
 end
 
