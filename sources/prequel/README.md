@@ -20,8 +20,8 @@ magick trial/blurb.tga blurb.png
 ```
 
 The scripts are the mod's own. `menu.luau` registers the game mode with the trial's objectives and
-draws the ending, `records.luau` gives the trial's ships, text, faces and ITAC text for the mode's
-missions, and `global.luau` picks the movie that plays when a mission is lost.
+draws the ending, `records.luau` gives the trial's ship stats and classes, text, faces and ITAC
+text for the mode's missions, and `global.luau` picks the movie that plays when a mission is lost.
 
 `mod.png` is a picture OpenReliant draws of mission 91, with the prequel in the game's `mods`
 folder: the player's Naginata just after its launch, with the Yamato behind. ImageMagick 7 crops it

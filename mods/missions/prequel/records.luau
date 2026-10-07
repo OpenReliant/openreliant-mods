@@ -2,21 +2,23 @@
 local records = require("openreliant.records")
 
 -- The Kalan Shuttle.
-local ship66 = records.ships[66]
-ship66.max_speed = 250
-ship66.yaw_rate = 0.09
--- The Yakob Shuttle.
-local ship153 = records.ships[153]
-ship153.max_speed = 300
-ship153.yaw_rate = 0.07
-ship153.yaw_inertia = 0.9
-ship153.pitch_rate = 0.07
-ship153.pitch_inertia = 0.85
-ship153.roll_rate = 0.15
-ship153.roll_inertia = 0.9
-ship153.shield_power = 14
-ship153.armor_class = 16
-ship153.shield_recharge = 15
+local kalan = records.ships.kalan_shuttle
+kalan.max_speed = 250
+kalan.yaw_rate = 0.09
+-- The Yakob Shuttle, which the trial's executable makes a fighter, so that the pirates fly and fight
+-- like fighters.
+local yakob = records.ships.yakob_shuttle
+yakob.max_speed = 300
+yakob.yaw_rate = 0.07
+yakob.yaw_inertia = 0.9
+yakob.pitch_rate = 0.07
+yakob.pitch_inertia = 0.85
+yakob.roll_rate = 0.15
+yakob.roll_inertia = 0.9
+yakob.shield_power = 14
+yakob.armor_class = 16
+yakob.shield_recharge = 15
+records.ship_types.yakob_shuttle.class = "fighter"
 
 -- The trial's text: the Ronin wing, its pilots and the pirates. The objectives' names are in
 -- menu.luau, with the missions.
