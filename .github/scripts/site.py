@@ -1,6 +1,8 @@
 """Writes the mods' site into site/: the index page, which browses the mods by category, with each
 mod's thumbnail, name, version, author, what it needs, its description and the download of its
-latest release; and updates/, every mod's releases, newest first.
+latest release; a page for each mod, mods/<mod>/, with its pictures, or its 3D model where its
+artist's catalogue gives one, what it is, its download and its releases; and updates/, every mod's
+releases, newest first.
 
     python3 .github/scripts/site.py
 """
@@ -148,6 +150,45 @@ footer { color: var(--muted); font-size: 14px; margin-top: 28px; }
 .changes { margin: 0; padding-left: 20px; color: #cfd3dd; }
 .changes li { margin: 2px 0; }
 @media (max-width: 520px) { .update { grid-template-columns: 1fr; } .update img { max-width: 200px; } }
+
+/* The cards lead to the mods' pages. */
+.shot a { display: block; }
+.shot a:hover img, .shot a:focus-visible img { filter: brightness(1.15); }
+.mod h2 a { color: var(--text); text-decoration: none; }
+.mod h2 a:hover { color: var(--accent); }
+
+/* A mod's page: its pictures or its 3D model, beside what it is and its download. */
+.detail {
+  display: grid; grid-template-columns: minmax(0, 3fr) minmax(0, 2fr); gap: 28px; padding: 22px; margin-bottom: 28px;
+  background: var(--brackets), linear-gradient(180deg, #141824, var(--card));
+  background-repeat: no-repeat; box-shadow: inset 0 0 0 1px var(--card-edge);
+}
+.detail h1 { font-size: clamp(30px, 5vw, 42px); }
+.views { display: flex; gap: 8px; margin-bottom: 10px; }
+.view {
+  font-family: var(--display); font-weight: 600; font-size: 15px; letter-spacing: 0.06em; text-transform: uppercase;
+  color: var(--muted); background: #141824; border: 1px solid var(--card-edge); padding: 5px 12px; cursor: pointer;
+}
+.view:hover { color: var(--accent); }
+.view[aria-pressed="true"] { color: var(--accent); border-color: var(--accent-dim); }
+.stage { position: relative; aspect-ratio: 4 / 3; background: #000; clip-path: var(--cut); }
+.stage img, .stage model-viewer { display: block; width: 100%; height: 100%; object-fit: contain; background: #000; }
+.hint { margin: 8px 0 0; font-size: 14px; color: var(--muted); }
+.hint:empty { display: none; }
+.gallery { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; }
+.gallery button { padding: 0; width: 96px; border: 1px solid var(--card-edge); background: #000; cursor: pointer; }
+.gallery button[aria-current="true"] { border-color: var(--accent); }
+.gallery img { display: block; width: 100%; aspect-ratio: 4 / 3; object-fit: cover; }
+.facts { display: grid; grid-template-columns: auto 1fr; gap: 6px 16px; margin: 0 0 20px; }
+.facts dt { font-family: var(--display); font-weight: 600; font-size: 14px; letter-spacing: 0.06em; text-transform: uppercase; color: var(--muted); padding-top: 2px; }
+.facts dd { margin: 0; overflow-wrap: anywhere; }
+.notes { margin-top: 22px; }
+.notes h2, .history h2 { font-family: var(--title); margin: 0 0 8px; font-size: 20px; letter-spacing: 0.04em; text-transform: uppercase; font-weight: normal; color: var(--accent); }
+.notes ul { margin: 0; padding-left: 20px; color: #cfd3dd; }
+.history { margin-top: 36px; }
+.history .updates { margin-top: 12px; }
+.history .update { grid-template-columns: 1fr; }
+@media (max-width: 760px) { .detail { grid-template-columns: 1fr; } }
 """
 
 # Browses the mods: the category, the search and the sort are in the address, as
@@ -269,6 +310,61 @@ BROWSE_SCRIPT = """
 """
 
 
+# A mod's page: its 3D view, where it has a model, loads model-viewer as it's first shown, and
+# its pictures take turns on the stage. Without scripts the page shows its first picture.
+DETAIL_SCRIPT = """
+(function () {
+  const stage = document.querySelector(".stage");
+  const hint = document.querySelector(".hint");
+  const views = Array.from(document.querySelectorAll(".view"));
+  const pictures = Array.from(document.querySelectorAll(".gallery button"));
+  const picture = stage.querySelector("img");
+  const model = stage.dataset.model;
+  let viewer = null;
+
+  const press = (view) => views.forEach((each) => each.setAttribute("aria-pressed", String(each === view)));
+  function showPicture(button) {
+    if (viewer) viewer.hidden = true;
+    picture.hidden = false;
+    if (button) {
+      picture.src = button.dataset.src;
+      picture.alt = button.dataset.alt;
+      pictures.forEach((each) => each.setAttribute("aria-current", String(each === button)));
+    }
+    hint.textContent = picture.alt === document.querySelector("h1").textContent ? "" : picture.alt;
+    press(views.find((view) => view.dataset.view === "picture"));
+  }
+  function showModel() {
+    press(views.find((view) => view.dataset.view === "model"));
+    if (!viewer) {
+      hint.textContent = "Loading the 3D model…";
+      import("https://cdn.jsdelivr.net/npm/@google/model-viewer@4.3.1/dist/model-viewer.min.js").then(() => {
+        viewer = document.createElement("model-viewer");
+        viewer.setAttribute("src", model);
+        viewer.setAttribute("alt", "A 3D model of the mod. Drag to turn it, scroll or pinch to zoom.");
+        viewer.setAttribute("camera-controls", "");
+        viewer.setAttribute("touch-action", "pan-y");
+        viewer.setAttribute("environment-image", "neutral");
+        viewer.setAttribute("shadow-intensity", "1");
+        if (!matchMedia("(prefers-reduced-motion: reduce)").matches) viewer.setAttribute("auto-rotate", "");
+        viewer.addEventListener("load", () => { hint.textContent = "Drag to turn it, scroll or pinch to zoom."; });
+        viewer.addEventListener("error", () => { showPicture(null); hint.textContent = "The 3D model can't be shown here."; });
+        stage.append(viewer);
+        picture.hidden = true;
+      }).catch(() => { showPicture(null); hint.textContent = "The 3D model can't be shown here."; });
+      return;
+    }
+    viewer.hidden = false;
+    picture.hidden = true;
+    hint.textContent = "Drag to turn it, scroll or pinch to zoom.";
+  }
+  views.forEach((view) => view.addEventListener("click", () => view.dataset.view === "model" ? showModel() : showPicture(null)));
+  pictures.forEach((button) => button.addEventListener("click", () => showPicture(button)));
+  if (model) showModel();
+})();
+"""
+
+
 def page(title: str, description: str, current: str, base: str, body: str, scripts: list[str]) -> str:
     """A page of the site, with the top bar's `current` link lit: `body` under it, then `scripts`.
     `base` leads from the page back to the site's top, such as ../ from updates/."""
@@ -325,13 +421,14 @@ def mod_releases() -> list[dict]:
     try:
         found = subprocess.run(
             ["gh", "api", f"repos/{REPOSITORY}/releases", "--paginate",
-             "--jq", ".[] | select(.draft | not) | {tag: .tag_name, date: .published_at, notes: .body}"],
+             "--jq", ".[] | select(.draft | not) | {tag: .tag_name, date: .published_at, notes: .body, "
+                     "assets: [.assets[] | {name, size}]}"],
             check=True, capture_output=True, text=True,
         ).stdout
         releases = [json.loads(line) for line in found.splitlines() if line.strip()]
     except (OSError, subprocess.CalledProcessError):
         tags = git("tag", "--list", "--format=%(refname:short) %(creatordate:iso-strict)").splitlines()
-        releases = [{"tag": tag, "date": date, "notes": ""} for tag, date in (line.split(" ", 1) for line in tags if " " in line)]
+        releases = [{"tag": tag, "date": date, "notes": "", "assets": []} for tag, date in (line.split(" ", 1) for line in tags if " " in line)]
     return sorted(releases, key=lambda release: release["date"], reverse=True)
 
 
@@ -349,46 +446,192 @@ def changes(notes: str) -> list[str]:
     return listed
 
 
-def where(category: Category, by_path: dict[str, Category], base: str) -> str:
-    """The category's place, as links to it and the categories it's in: Ships / Fighters."""
+def trail_of(category: Category, by_path: dict[str, Category]) -> list[Category]:
+    """The categories from the top down to `category`, without mods/ itself."""
     trail = []
     at: Category | None = category
     while at is not None and at.path:
         trail.insert(0, at)
         at = by_path.get(at.parent_path) if at.parent_path is not None else None
-    links = [f'<a href="{base}?category={html.escape(step.path)}">{html.escape(step.name)}</a>' for step in trail]
-    return f'<p class="where">{" / ".join(links)}</p>'
+    return trail
+
+
+def category_links(category: Category, by_path: dict[str, Category], base: str) -> list[str]:
+    """Links to `category` and the categories it's in, from the top down."""
+    return [f'<a href="{base}?category={html.escape(step.path)}">{html.escape(step.name)}</a>' for step in trail_of(category, by_path)]
+
+
+def where(category: Category, by_path: dict[str, Category], base: str) -> str:
+    """The category's place, as links to it and the categories it's in: Ships / Fighters."""
+    return f'<p class="where">{" / ".join(category_links(category, by_path, base))}</p>'
 
 
 def card(mod, by_path: dict[str, Category], release: dict | None, updated: str) -> str:
     text = html.escape
-    picture = f'<img src="thumbs/{text(mod.id)}.png" alt="{text(mod.name)}">' if mod.thumbnail else '<img alt="">'
-    badges = [f'<span class="badge version">Version {text(mod.version)}</span>' if mod.version else "",
-              f'<span class="badge">by {text(mod.author)}</span>' if mod.author else "",
-              f'<span class="badge">Needs OpenReliant {text(mod.needs)}</span>' if mod.needs else "",
-              f'<span class="badge">Updated {text(updated[:10])}</span>' if updated else ""]
-    if mod.needs and release and version_tuple(release["tagName"]) < version_tuple(mod.needs):
-        badges.append(f'<span class="badge waiting">OpenReliant {text(mod.needs)} is coming soon</span>')
-    label, address = mod.credits()
-    licence = f'<a href="{text(address)}">{text(label)}</a>'
-    # For an artist's mod, its folder in their repository at the pinned commit.
-    if mod.artist and label != "Source":
-        licence += f'<a href="{text(mod.source_page())}">Source</a>'
-    # The mod's own page, where its manifest or its artist gives one other than this collection.
-    if mod.url and REPOSITORY not in mod.url:
-        licence += f'<a href="{text(mod.url)}">Website</a>'
+    picture = (f'<a href="{text(mod.page)}" aria-label="{text(mod.name)}: its page">'
+               + (f'<img src="thumbs/{text(mod.id)}.png" alt="{text(mod.name)}">' if mod.thumbnail else '<img alt="">') + '</a>')
+    badges = badges_of(mod, release, updated)
+    details = f'<a href="{text(mod.page)}">Details</a>'
     if mod.released():
         download = (f'<a class="download" href="{text(mod.download())}">Download {text(mod.archive)}</a>'
-                    f'<div class="links"><a href="{text(mod.download())}.sha256">Checksum</a>'
-                    f'<a href="{text(mod.release_page())}">Release notes</a>{licence}</div>')
+                    f'<div class="links">{details}<a href="{text(mod.download())}.sha256">Checksum</a>'
+                    f'<a href="{text(mod.release_page())}">Release notes</a>{links_of(mod)}</div>')
     else:
-        download = f'<p class="unreleased">Not released yet.</p><div class="links">{licence}</div>'
+        download = f'<p class="unreleased">Not released yet.</p><div class="links">{details}{links_of(mod)}</div>'
     searched = " ".join([mod.name, mod.author, mod.description]).lower()
     data = (f'data-category="{text(mod.category)}" data-name="{text(mod.name.lower())}" data-updated="{text(updated)}" '
             f'data-text="{text(searched)}"')
     return (f'<article class="mod" {data}><div class="shot">{picture}</div><div>{where(by_path[mod.category], by_path, "")}'
-            f'<h2>{text(mod.name)}</h2><div class="badges">{"".join(badges)}</div>'
+            f'<h2><a href="{text(mod.page)}">{text(mod.name)}</a></h2><div class="badges">{badges}</div>'
             f'<p class="description">{text(mod.description)}</p>{download}</div></article>')
+
+
+def badges_of(mod, release: dict | None, updated: str) -> str:
+    """Its version, its author, the OpenReliant it needs and when it was last updated, as badges,
+    and a note where it needs an OpenReliant newer than the latest release."""
+    text = html.escape
+    badges = [f'<span class="badge version">Version {text(mod.version)}</span>' if mod.version else "",
+              f'<span class="badge">by {text(mod.author)}</span>' if mod.author else "",
+              f'<span class="badge">Needs OpenReliant {text(mod.needs)}</span>' if mod.needs else "",
+              f'<span class="badge">Updated {text(updated[:10])}</span>' if updated else ""]
+    return "".join(badges) + waiting_badge(mod, release)
+
+
+def waiting_badge(mod, release: dict | None) -> str:
+    """A note where it needs an OpenReliant newer than the latest release."""
+    if mod.needs and release and version_tuple(release["tagName"]) < version_tuple(mod.needs):
+        return f'<span class="badge waiting">OpenReliant {html.escape(mod.needs)} is coming soon</span>'
+    return ""
+
+
+def waiting_of(mod, release: dict | None) -> str:
+    """The waiting note as a mod's page shows it, in a row of its own."""
+    badge = waiting_badge(mod, release)
+    return f'<div class="badges">{badge}</div>' if badge else ""
+
+
+def links_of(mod) -> str:
+    """The links to its credits and licence, its source in an artist's repository, and its own
+    website, where its manifest or its artist gives one other than this collection."""
+    text = html.escape
+    label, address = mod.credits()
+    links = f'<a href="{text(address)}">{text(label)}</a>'
+    if mod.artist and label != "Source":
+        links += f'<a href="{text(mod.source_page())}">Source</a>'
+    if mod.url and REPOSITORY not in mod.url:
+        links += f'<a href="{text(mod.url)}">Website</a>'
+    return links
+
+
+def size_of(megabytes: float) -> str:
+    return f"{megabytes:.1f} MB" if megabytes < 1000 else f"{megabytes / 1000:.2f} GB"
+
+
+def history(mod, releases: list[dict]) -> str:
+    """Its releases, newest first, each with what changed."""
+    text = html.escape
+    entries = []
+    for release in releases:
+        mod_id, _, version = release["tag"].rpartition("-v")
+        if mod_id != mod.id or not version:
+            continue
+        items = "".join(f"<li>{text(change)}</li>" for change in changes(release["notes"]))
+        download = f"https://github.com/{REPOSITORY}/releases/download/{release['tag']}/{mod.archive}"
+        page_url = f"https://github.com/{REPOSITORY}/releases/tag/{release['tag']}"
+        entries.append(
+            f'<li class="update"><div><p class="when">{text(release["date"][:10])}</p>'
+            f'<h2>Version {text(version)}</h2>' + (f'<ul class="changes">{items}</ul>' if items else "")
+            + f'<div class="links"><a href="{text(download)}">Download</a><a href="{text(page_url)}">Release notes</a></div></div></li>')
+    if not entries:
+        return ""
+    return f'<section class="history"><h2>Releases</h2><ol class="updates">{"".join(entries)}</ol></section>'
+
+
+def mod_page(mod, by_path: dict[str, Category], release: dict | None, releases: list[dict], updated: str, built: str) -> str:
+    """A mod's own page: its pictures, or its 3D model where its artist's catalogue gives one; what
+    it is and what it needs; its download; its artist's notes; how to install it; and its
+    releases."""
+    text = html.escape
+    base = "../../"
+    listing = mod.artist.listing(mod.files) if mod.artist else None
+    # Its pictures: its screenshots, then its thumbnail; for an artist's pack, the in-game picture
+    # and the 3D model the catalogue gives, from the artist's own site.
+    pictures = [(path.name, f"{mod.name} in OpenReliant") for path in mod.screenshots()]
+    model = ""
+    if listing and mod.artist.url:
+        if listing.get("preview"):
+            pictures.insert(0, (mod.artist.url + str(listing["preview"]), f"{mod.name} in OpenReliant"))
+        if listing.get("model"):
+            model = mod.artist.url + str(listing["model"])
+    if mod.thumbnail:
+        pictures.append((f"{base}thumbs/{mod.id}.png", mod.name))
+    first = pictures[0] if pictures else ("", "")
+    views = ""
+    if model:
+        views = ('<div class="views" role="group" aria-label="What the stage shows">'
+                 '<button type="button" class="view" data-view="model" aria-pressed="false">3D model</button>'
+                 '<button type="button" class="view" data-view="picture" aria-pressed="true">Pictures</button></div>')
+    gallery = ""
+    if len(pictures) > 1:
+        gallery = '<div class="gallery">' + "".join(
+            f'<button type="button" data-src="{text(src)}" data-alt="{text(alt)}" aria-current="{str(at == 0).lower()}" aria-label="Show {text(alt)}">'
+            f'<img src="{text(src)}" alt="" loading="lazy"></button>' for at, (src, alt) in enumerate(pictures)) + "</div>"
+    stage = (f'{views}<div class="stage" data-model="{text(model)}"><img src="{text(first[0])}" alt="{text(first[1])}"></div>'
+             f'<p class="hint">{text(first[1]) if first[1] != mod.name else ""}</p>{gallery}')
+
+    facts = []
+    if mod.version:
+        facts.append(("Version", text(mod.version)))
+    if mod.author:
+        facts.append(("By", text(mod.author)))
+    if mod.needs:
+        facts.append(("Needs", f"OpenReliant {text(mod.needs)}"))
+    facts.append(("Category", " / ".join(category_links(by_path[mod.category], by_path, base))))
+    latest = next((found for found in releases if found["tag"] == mod.tag), None)
+    if latest:
+        size = next((asset["size"] for asset in latest.get("assets", []) if asset.get("name") == mod.archive), None)
+        if size:
+            facts.append(("Download", f"{size_of(size / 1_000_000)}, <code>{text(mod.archive)}</code>"))
+        facts.append(("Released", text(latest["date"][:10])))
+    facts_list = "".join(f"<dt>{name}</dt><dd>{value}</dd>" for name, value in facts)
+
+    if mod.released():
+        download = (f'<a class="download" href="{text(mod.download())}">Download {text(mod.archive)}</a>'
+                    f'<div class="links"><a href="{text(mod.download())}.sha256">Checksum</a>'
+                    f'<a href="{text(mod.release_page())}">Release notes</a>{links_of(mod)}</div>')
+    else:
+        download = f'<p class="unreleased">Not released yet.</p><div class="links">{links_of(mod)}</div>'
+    notes = ""
+    if listing and listing.get("notes"):
+        items = "".join(f"<li>{text(str(note))}</li>" for note in listing["notes"])
+        notes = f'<section class="notes"><h2>Still to come</h2><ul>{items}</ul></section>'
+
+    body = f"""<nav class="crumbs" aria-label="Category"><ol><li><a href="{base}">All mods</a></li>{crumbs_of(by_path[mod.category], by_path, base)}<li><span aria-current="page">{text(mod.name)}</span></li></ol></nav>
+<article class="detail">
+<div class="media">{stage}</div>
+<div>
+<h1>{text(mod.name)}</h1>
+{waiting_of(mod, release)}
+<p class="description">{text(mod.description)}</p>
+<dl class="facts">{facts_list}</dl>
+{download}
+{notes}
+</div>
+</article>
+<section class="install">
+<h3>Installing it</h3>
+<p>Download <code>{text(mod.archive)}</code> and <code>{text(mod.archive)}.sha256</code>, put both in the <code>mods</code> folder of your game folder, next to <code>resource.hog</code>, and turn the mod on in OpenReliant's mods screen.</p>
+</section>
+{history(mod, releases)}
+<footer>
+<p><a href="https://github.com/{REPOSITORY}">The mods' sources</a>, with each mod's credits and licence. Updated {text(built)}. Headings are set in Newtown, by Roger White, from Roger's Fonts.</p>
+</footer>"""
+    return page(f"{mod.name}: OpenReliant mods", mod.description or f"{mod.name}, a mod for OpenReliant.", "mods", base, body, [DETAIL_SCRIPT])
+
+
+def crumbs_of(category: Category, by_path: dict[str, Category], base: str) -> str:
+    """The categories down to `category`, as the breadcrumbs' items."""
+    return "".join(f"<li>{link}</li>" for link in category_links(category, by_path, base))
 
 
 def index_page(root: Category, release: dict | None, updated_at: dict[str, str], updated: str) -> str:
@@ -444,12 +687,12 @@ def updates_page(root: Category, releases: list[dict], updated: str) -> str:
             continue
         listed = changes(release["notes"])
         items = "".join(f"<li>{text(change)}</li>" for change in listed)
-        picture = f'<img src="../thumbs/{text(mod.id)}.png" alt="">' if mod.thumbnail else '<img alt="">'
+        picture = (f'<a href="../{text(mod.page)}" tabindex="-1">' + (f'<img src="../thumbs/{text(mod.id)}.png" alt="">' if mod.thumbnail else '<img alt="">') + "</a>")
         download = f"https://github.com/{REPOSITORY}/releases/download/{release['tag']}/{mod.archive}"
         page_url = f"https://github.com/{REPOSITORY}/releases/tag/{release['tag']}"
         entries.append(
             f'<li class="update">{picture}<div><p class="when">{text(release["date"][:10])}</p>{where(by_path[mod.category], by_path, "../")}'
-            f'<h2><a href="../?category={text(mod.category)}">{text(mod.name)}</a><span class="badge version">Version {text(version)}</span></h2>'
+            f'<h2><a href="../{text(mod.page)}">{text(mod.name)}</a><span class="badge version">Version {text(version)}</span></h2>'
             + (f'<ul class="changes">{items}</ul>' if items else "")
             + f'<div class="links"><a href="{text(download)}">Download</a><a href="{text(page_url)}">Release notes</a></div></div></li>')
     listing = f'<ol class="updates">{"".join(entries)}</ol>' if entries else '<div class="empty"><p>No releases yet.</p></div>'
@@ -486,7 +729,14 @@ def main() -> int:
     updated = git("log", "-1", "--format=%cs")
     (SITE / "index.html").write_text(index_page(root, release, updated_at, updated), encoding="utf-8")
     (SITE / "updates" / "index.html").write_text(updates_page(root, releases, updated), encoding="utf-8")
-    print(f"wrote {SITE / 'index.html'} and {SITE / 'updates' / 'index.html'}: {len(mods)} mods, {len(releases)} releases")
+    by_path = {category.path: category for category in all_categories(root)}
+    for mod in mods:
+        folder = SITE / mod.page
+        folder.mkdir(parents=True)
+        for picture in mod.screenshots():
+            shutil.copy(picture, folder / picture.name)
+        (folder / "index.html").write_text(mod_page(mod, by_path, release, releases, updated_at.get(mod.id, ""), updated), encoding="utf-8")
+    print(f"wrote {SITE / 'index.html'}, {SITE / 'updates' / 'index.html'} and a page for each mod: {len(mods)} mods, {len(releases)} releases")
     return 0
 
 
