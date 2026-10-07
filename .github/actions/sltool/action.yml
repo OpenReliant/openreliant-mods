@@ -1,11 +1,11 @@
 name: sltool
-description: Puts OpenReliant's sltool on the PATH, built from a branch of OpenReliant or taken from its latest release.
+description: Puts OpenReliant's sltool on the PATH, taken from its latest release or built from a branch of OpenReliant.
 inputs:
   source:
     description: >-
       Where sltool comes from: "release" for the latest release's, or the name of a branch or tag
-      of OpenReliant to build it from. Main until a release can pack every mod here.
-    default: main
+      of OpenReliant to build it from, for a mod that needs something not released yet.
+    default: release
 runs:
   using: composite
   steps:
