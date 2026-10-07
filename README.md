@@ -4,7 +4,9 @@ Mods for [OpenReliant](https://github.com/OpenReliant/openreliant), the open-sou
 of StarLancer's engine. Each mod here is checked by the OpenReliant maintainers: it works with the
 OpenReliant version its manifest names, and its licence lets you share it.
 
-You need OpenReliant and your own copy of StarLancer. No mod here holds any of the game's files.
+You need OpenReliant and your own copy of StarLancer. No mod here holds the game's archives or its
+files as they ship. Some art packs rework the game's own models and textures, and work over your
+copy of the game all the same.
 
 **[Browse and download the mods](https://openreliant.github.io/openreliant-mods/)**, by category,
 each from its latest release, and see [the latest updates](https://openreliant.github.io/openreliant-mods/updates/).
@@ -14,6 +16,10 @@ each from its latest release, and see [the latest updates](https://openreliant.g
 | Mod | Category | What it adds | Needs | Licence |
 |---|---|---|---|---|
 | [Instructor, Shut Up](mods/gameplay/instructor-shut-up) | Gameplay | Instant Action truly becomes Instant | OpenReliant 0.7 | MPL-2.0 |
+| [Coyote Worn](mods/ships/fighters/alliance/coyote-worn) | Ships / Fighters / Alliance | KonCyptFysh's worn restoration of the Coyote, with material maps | OpenReliant 0.6.3 | See [LICENSING.md](https://github.com/KonCyptFysh/OpenReliant-Art-Packs/blob/main/LICENSING.md) |
+| [Predator Worn](mods/ships/fighters/alliance/predator-worn) | Ships / Fighters / Alliance | KonCyptFysh's worn restoration of the Predator, with material maps | OpenReliant 0.6.3 | See [LICENSING.md](https://github.com/KonCyptFysh/OpenReliant-Art-Packs/blob/main/LICENSING.md) |
+| [Reaper Worn](mods/ships/fighters/alliance/reaper-worn) | Ships / Fighters / Alliance | KonCyptFysh's worn restoration of the Reaper, with material maps | OpenReliant 0.6.3 | See [LICENSING.md](https://github.com/KonCyptFysh/OpenReliant-Art-Packs/blob/main/LICENSING.md) |
+| [Wolverine Worn](mods/ships/fighters/alliance/wolverine-worn) | Ships / Fighters / Alliance | KonCyptFysh's worn restoration of the Wolverine, with material maps | OpenReliant 0.6.3 | See [LICENSING.md](https://github.com/KonCyptFysh/OpenReliant-Art-Packs/blob/main/LICENSING.md) |
 | [Viper Mk II](mods/ships/fighters/viper) | Ships / Fighters | Fly the Viper Mk II from Battlestar Galactica: fast and agile, with two kinetic guns, light shields and a strong hull | OpenReliant 0.7 | Model and pictures CC-BY-NC-4.0, by LocoPixel ([credits](mods/ships/fighters/viper/license.txt)) |
 
 ## Installing a mod
@@ -25,7 +31,9 @@ screen. OpenReliant checks the archive against its checksum as it loads it.
 To try the latest changes before they're released, copy the mod's own folder into the same `mods`
 folder instead, keeping its name: `mods/ships/fighters/viper` becomes `<game>/mods/viper`. The name
 matters: the game and the mod's scripts know what a mod adds by it, such as `viper:viper` for the
-Viper, and `viper.hog` gives the same names.
+Viper, and `viper.hog` gives the same names. For a mod kept in another repository, copy its folder
+from there, renamed as the mod is called here: `Alliance Fighters/Coyote/mods/30-coyote-worn-v4`
+becomes `<game>/mods/coyote-worn`.
 
 ```text
 StarLancer/
@@ -53,12 +61,63 @@ in it as the paragraph after, and links to its own categories in the order the s
 category with no mods yet still shows on the site, with none in it. To add a category, add a folder
 with its `README.md`, and link to it from the README of the category it's in.
 
+## Mods kept in other repositories
+
+An artist can keep their mods in their own repository, and the collection packs and releases them
+from there. The repository is a submodule under `external/`, pinned to a commit:
+
+```sh
+git submodule add https://github.com/<artist>/<repository>.git external/<artist>
+```
+
+`external/<artist>.ini` gives the artist's name and web page, for the mods whose `mod.ini` leaves
+them out:
+
+```ini
+[Artist]
+Name=KonCyptFysh
+Url=https://koncyptfysh.github.io/OpenReliant-Art-Packs/
+```
+
+Each mod gets a folder in its category, named as the mod is to be called here, holding a
+`source.ini` in place of the mod's files:
+
+```ini
+[Source]
+Submodule=external/koncyptfysh
+Folder=Alliance Fighters/Coyote/mods
+```
+
+`Folder` is the folder of the artist's repository that holds the mod's own folder, whatever that's
+called, so the mod's folder there can carry its version in its name. Where it holds more than one,
+the one with the highest `Version` is the mod. The card links to the artist's licence or credits
+file, from the mod's folder or the top of the repository, and to the mod's folder there.
+
+To release a new version, the artist raises the `Version` in the mod's `mod.ini` in their
+repository, and opens a pull request here that moves the pin:
+
+```sh
+git -C external/<artist> pull origin main
+git add external/<artist>
+```
+
+The workflows fetch the Git LFS files of the mods' own folders and no others, and cache them by the
+pins, so that each pin costs the artist's LFS bandwidth once. To work with the mods locally, check
+out the submodules without their LFS files, then fetch the same files:
+
+```sh
+GIT_LFS_SKIP_SMUDGE=1 git submodule update --init
+python3 .github/scripts/mods.py lfs-includes --packs | while IFS=$'\t' read -r submodule include; do
+  git -C "$submodule" lfs pull --include "$include"
+done
+```
+
 ## Releasing a mod
 
 A mod's version is the `Version` in its `mod.ini`. To release it, raise the version and push to
 `main`. The Publish workflow then:
 
-1. packs the mod's folder into `<mod>.hog` with `sltool hog pack --checksum`, with
+1. packs the mod's files into `<mod>.hog` with `sltool hog pack --checksum`, with
    `<mod>.hog.sha256` beside it. `sltool` comes from OpenReliant's latest release. To build it
    from a branch of OpenReliant instead, give that branch as the `source` of
    `.github/actions/sltool`;
