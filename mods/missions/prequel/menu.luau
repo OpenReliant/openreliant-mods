@@ -73,6 +73,8 @@ core.register_game_mode({
     -- ends on its blurb.
     briefing_room = "yamato",
     debriefing = true,
+    -- The trial's wing: the Ronin wing's leader, Tanaka, flies Alpha 6, where the game has Viper.
+    wing_pilots = { "none", "none", "none", "none", "ronin_leader" },
     ending = "ending",
     records = "records.luau",
 })
