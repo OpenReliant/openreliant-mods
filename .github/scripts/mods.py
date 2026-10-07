@@ -20,8 +20,8 @@ of the collection's mods, in the category it maps to. The mod is named after its
 the order number before it and the version after it: 30-coyote-worn-v4 is coyote-worn. Where two
 folders give one name, the one with the higher Version is the mod. Catalog, where the artist keeps
 one, names a JSON file listing their packs, as KonCyptFysh's does; then only the packs it marks
-available count, and a pack's page on the site shows the in-game picture, the 3D model and the
-notes its entry gives. Name and Url stand in for a mod's Author and Url where its mod.ini leaves
+available count, and a pack's page on the site shows the in-game picture and the notes its entry
+gives. Name and Url stand in for a mod's Author and Url where its mod.ini leaves
 them out. A new pack, or a new version of one, needs only the pin moved.
 
     python3 .github/scripts/mods.py lfs-includes --packs|--thumbnails
