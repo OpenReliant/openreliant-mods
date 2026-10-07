@@ -97,9 +97,8 @@ each entry of `assets`, and the rest of the file is the artist's own:
 
 - `folder`: the folder of the repository that holds the mod's folder.
 - `status`: `available` for a mod that's out. Any other status leaves the mod out until it changes.
-- `preview`, `model` and `notes`, where an entry gives them: an in-game picture and a 3D model,
-  by their paths on the artist's site (`Url`), and a list of notes. The mod's page on the site
-  shows them.
+- `preview` and `notes`, where an entry gives them: an in-game picture, by its path on the
+  artist's site (`Url`), and a list of notes. The mod's page on the site shows them.
 
 Without a catalogue, every mod of the repository is picked up.
 

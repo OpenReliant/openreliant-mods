@@ -1,8 +1,7 @@
 """Writes the mods' site into site/: the index page, which browses the mods by category, with each
 mod's thumbnail, name, version, author, what it needs, its description and the download of its
-latest release; a page for each mod, mods/<mod>/, with its pictures, or its 3D model where its
-artist's catalogue gives one, what it is, its download and its releases; and updates/, every mod's
-releases, newest first.
+latest release; a page for each mod, mods/<mod>/, with its pictures, what it is, its download and
+its releases; and updates/, every mod's releases, newest first.
 
     python3 .github/scripts/site.py
 """
@@ -157,22 +156,15 @@ footer { color: var(--muted); font-size: 14px; margin-top: 28px; }
 .mod h2 a { color: var(--text); text-decoration: none; }
 .mod h2 a:hover { color: var(--accent); }
 
-/* A mod's page: its pictures or its 3D model, beside what it is and its download. */
+/* A mod's page: its pictures, beside what it is and its download. */
 .detail {
   display: grid; grid-template-columns: minmax(0, 3fr) minmax(0, 2fr); gap: 28px; padding: 22px; margin-bottom: 28px;
   background: var(--brackets), linear-gradient(180deg, #141824, var(--card));
   background-repeat: no-repeat; box-shadow: inset 0 0 0 1px var(--card-edge);
 }
 .detail h1 { font-size: clamp(30px, 5vw, 42px); }
-.views { display: flex; gap: 8px; margin-bottom: 10px; }
-.view {
-  font-family: var(--display); font-weight: 600; font-size: 15px; letter-spacing: 0.06em; text-transform: uppercase;
-  color: var(--muted); background: #141824; border: 1px solid var(--card-edge); padding: 5px 12px; cursor: pointer;
-}
-.view:hover { color: var(--accent); }
-.view[aria-pressed="true"] { color: var(--accent); border-color: var(--accent-dim); }
 .stage { position: relative; aspect-ratio: 4 / 3; background: #000; clip-path: var(--cut); }
-.stage img, .stage model-viewer { display: block; width: 100%; height: 100%; object-fit: contain; background: #000; }
+.stage img { display: block; width: 100%; height: 100%; object-fit: contain; background: #000; }
 .hint { margin: 8px 0 0; font-size: 14px; color: var(--muted); }
 .hint:empty { display: none; }
 .gallery { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; }
@@ -310,57 +302,19 @@ BROWSE_SCRIPT = """
 """
 
 
-# A mod's page: its 3D view, where it has a model, loads model-viewer as it's first shown, and
-# its pictures take turns on the stage. Without scripts the page shows its first picture.
+# A mod's page: its pictures take turns on the stage. Without scripts the page shows its first.
 DETAIL_SCRIPT = """
 (function () {
-  const stage = document.querySelector(".stage");
+  const picture = document.querySelector(".stage img");
   const hint = document.querySelector(".hint");
-  const views = Array.from(document.querySelectorAll(".view"));
+  const name = document.querySelector("h1").textContent;
   const pictures = Array.from(document.querySelectorAll(".gallery button"));
-  const picture = stage.querySelector("img");
-  const model = stage.dataset.model;
-  let viewer = null;
-
-  const press = (view) => views.forEach((each) => each.setAttribute("aria-pressed", String(each === view)));
-  function showPicture(button) {
-    if (viewer) viewer.hidden = true;
-    picture.hidden = false;
-    if (button) {
-      picture.src = button.dataset.src;
-      picture.alt = button.dataset.alt;
-      pictures.forEach((each) => each.setAttribute("aria-current", String(each === button)));
-    }
-    hint.textContent = picture.alt === document.querySelector("h1").textContent ? "" : picture.alt;
-    press(views.find((view) => view.dataset.view === "picture"));
-  }
-  function showModel() {
-    press(views.find((view) => view.dataset.view === "model"));
-    if (!viewer) {
-      hint.textContent = "Loading the 3D model…";
-      import("https://cdn.jsdelivr.net/npm/@google/model-viewer@4.3.1/dist/model-viewer.min.js").then(() => {
-        viewer = document.createElement("model-viewer");
-        viewer.setAttribute("src", model);
-        viewer.setAttribute("alt", "A 3D model of the mod. Drag to turn it, scroll or pinch to zoom.");
-        viewer.setAttribute("camera-controls", "");
-        viewer.setAttribute("touch-action", "pan-y");
-        viewer.setAttribute("environment-image", "neutral");
-        viewer.setAttribute("shadow-intensity", "1");
-        if (!matchMedia("(prefers-reduced-motion: reduce)").matches) viewer.setAttribute("auto-rotate", "");
-        viewer.addEventListener("load", () => { hint.textContent = "Drag to turn it, scroll or pinch to zoom."; });
-        viewer.addEventListener("error", () => { showPicture(null); hint.textContent = "The 3D model can't be shown here."; });
-        stage.append(viewer);
-        picture.hidden = true;
-      }).catch(() => { showPicture(null); hint.textContent = "The 3D model can't be shown here."; });
-      return;
-    }
-    viewer.hidden = false;
-    picture.hidden = true;
-    hint.textContent = "Drag to turn it, scroll or pinch to zoom.";
-  }
-  views.forEach((view) => view.addEventListener("click", () => view.dataset.view === "model" ? showModel() : showPicture(null)));
-  pictures.forEach((button) => button.addEventListener("click", () => showPicture(button)));
-  if (model) showModel();
+  pictures.forEach((button) => button.addEventListener("click", () => {
+    picture.src = button.dataset.src;
+    picture.alt = button.dataset.alt;
+    hint.textContent = button.dataset.alt === name ? "" : button.dataset.alt;
+    pictures.forEach((each) => each.setAttribute("aria-current", String(each === button)));
+  }));
 })();
 """
 
@@ -548,35 +502,25 @@ def history(mod, releases: list[dict]) -> str:
 
 
 def mod_page(mod, by_path: dict[str, Category], release: dict | None, releases: list[dict], updated: str, built: str) -> str:
-    """A mod's own page: its pictures, or its 3D model where its artist's catalogue gives one; what
-    it is and what it needs; its download; its artist's notes; how to install it; and its
-    releases."""
+    """A mod's own page: its pictures; what it is and what it needs; its download; its artist's
+    notes; how to install it; and its releases."""
     text = html.escape
     base = "../../"
     listing = mod.artist.listing(mod.files) if mod.artist else None
-    # Its pictures: its screenshots, then its thumbnail; for an artist's pack, the in-game picture
-    # and the 3D model the catalogue gives, from the artist's own site.
+    # Its pictures: its screenshots, or for an artist's pack the in-game picture its catalogue
+    # gives, from the artist's own site, then its thumbnail.
     pictures = [(path.name, f"{mod.name} in OpenReliant") for path in mod.screenshots()]
-    model = ""
-    if listing and mod.artist.url:
-        if listing.get("preview"):
-            pictures.insert(0, (mod.artist.url + str(listing["preview"]), f"{mod.name} in OpenReliant"))
-        if listing.get("model"):
-            model = mod.artist.url + str(listing["model"])
+    if listing and mod.artist.url and listing.get("preview"):
+        pictures.insert(0, (mod.artist.url + str(listing["preview"]), f"{mod.name} in OpenReliant"))
     if mod.thumbnail:
         pictures.append((f"{base}thumbs/{mod.id}.png", mod.name))
     first = pictures[0] if pictures else ("", "")
-    views = ""
-    if model:
-        views = ('<div class="views" role="group" aria-label="What the stage shows">'
-                 '<button type="button" class="view" data-view="model" aria-pressed="false">3D model</button>'
-                 '<button type="button" class="view" data-view="picture" aria-pressed="true">Pictures</button></div>')
     gallery = ""
     if len(pictures) > 1:
         gallery = '<div class="gallery">' + "".join(
             f'<button type="button" data-src="{text(src)}" data-alt="{text(alt)}" aria-current="{str(at == 0).lower()}" aria-label="Show {text(alt)}">'
             f'<img src="{text(src)}" alt="" loading="lazy"></button>' for at, (src, alt) in enumerate(pictures)) + "</div>"
-    stage = (f'{views}<div class="stage" data-model="{text(model)}"><img src="{text(first[0])}" alt="{text(first[1])}"></div>'
+    stage = (f'<div class="stage"><img src="{text(first[0])}" alt="{text(first[1])}"></div>'
              f'<p class="hint">{text(first[1]) if first[1] != mod.name else ""}</p>{gallery}')
 
     facts = []
