@@ -13,7 +13,7 @@ import pathlib
 import subprocess
 import sys
 
-from mods import ROOT, all_mods, git
+from mods import ROOT, git, problems, tree
 
 DIST = ROOT / "dist"
 
@@ -30,7 +30,7 @@ def notes(mod) -> str:
     since its last release."""
     earlier = [tag for tag in git("tag", "--list", f"{mod.id}-v*", "--sort=-creatordate").splitlines() if tag]
     since = [f"{earlier[0]}..HEAD"] if earlier else []
-    changes = git("log", "--format=- %s", *since, "--", f"mods/{mod.id}", f"sources/{mod.id}")
+    changes = git("log", "--format=- %s", *since, "--", mod.path, f"sources/{mod.id}")
     lines = [
         mod.description,
         "",
@@ -42,7 +42,7 @@ def notes(mod) -> str:
         "`resource.hog`, and turn the mod on in OpenReliant's mods screen. OpenReliant checks the "
         "archive against its checksum as it loads it.",
         "",
-        f"Credits and licence: [license.txt](https://github.com/OpenReliant/openreliant-mods/blob/{mod.tag}/mods/{mod.id}/license.txt).",
+        f"Credits and licence: [license.txt](https://github.com/OpenReliant/openreliant-mods/blob/{mod.tag}/{mod.path}/license.txt).",
         "",
         "## Changes" if not earlier else f"## Changes since {earlier[0]}",
         "",
@@ -53,8 +53,14 @@ def notes(mod) -> str:
 
 def main() -> int:
     dry_run = "--dry-run" in sys.argv[1:]
+    root = tree()
+    # A layout that's wrong releases nothing.
+    if found := problems(root):
+        for problem in found:
+            print(problem, file=sys.stderr)
+        return 1
     failed = False
-    for mod in all_mods():
+    for mod in root.all_mods():
         if not mod.version:
             print(f"{mod.id}: mod.ini gives no Version, so it isn't released", file=sys.stderr)
             failed = True
