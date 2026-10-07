@@ -1,13 +1,14 @@
-# Releases each mod whose mod.ini gives a version that has no release yet, then rebuilds the index
-# page on GitHub Pages. To release a mod, raise the Version in its mod.ini and push to main: the
-# mod is packed into <mod>.hog with sltool, with <mod>.hog.sha256 beside it, and published as the
-# release <mod>-v<version> with both attached. The page lists every mod with its latest download.
+# Releases each mod whose mod.ini gives a version that has no release yet, then rebuilds the site
+# on GitHub Pages. To release a mod, raise the Version in its mod.ini and push to main: the mod is
+# packed into <mod>.hog with sltool, with <mod>.hog.sha256 beside it, and published as the release
+# <mod>-v<version> with both attached. The site lists every mod by category with its latest
+# download, and every release on its updates page.
 name: Publish
 
 on:
   push:
     branches: [main]
-  # Once a day, the page alone, so that it shows OpenReliant's latest release.
+  # Once a day, the site alone, so that it shows OpenReliant's latest release.
   schedule:
     - cron: "17 5 * * *"
   workflow_dispatch:

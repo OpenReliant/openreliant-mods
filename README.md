@@ -6,15 +6,15 @@ OpenReliant version its manifest names, and its licence lets you share it.
 
 You need OpenReliant and your own copy of StarLancer. No mod here holds any of the game's files.
 
-**[Browse and download the mods](https://openreliant.github.io/openreliant-mods/)**, each from its
-latest release.
+**[Browse and download the mods](https://openreliant.github.io/openreliant-mods/)**, by category,
+each from its latest release, and see [the latest updates](https://openreliant.github.io/openreliant-mods/updates/).
 
 ## Mods
 
-| Mod | What it adds | Needs | Licence |
-|---|---|---|---|
-| [Instructor, Shut Up](mods/instructor-shut-up) | Instant Action truly becomes Instant | OpenReliant 0.7 | MPL-2.0 |
-| [Viper Mk II](mods/viper) | Fly the Viper Mk II from Battlestar Galactica: fast and agile, with two kinetic guns, light shields and a strong hull | OpenReliant 0.7 | Model and pictures CC-BY-NC-4.0, by LocoPixel ([credits](mods/viper/license.txt)) |
+| Mod | Category | What it adds | Needs | Licence |
+|---|---|---|---|---|
+| [Instructor, Shut Up](mods/gameplay/instructor-shut-up) | Gameplay | Instant Action truly becomes Instant | OpenReliant 0.7 | MPL-2.0 |
+| [Viper Mk II](mods/ships/fighters/viper) | Ships / Fighters | Fly the Viper Mk II from Battlestar Galactica: fast and agile, with two kinetic guns, light shields and a strong hull | OpenReliant 0.7 | Model and pictures CC-BY-NC-4.0, by LocoPixel ([credits](mods/ships/fighters/viper/license.txt)) |
 
 ## Installing a mod
 
@@ -22,8 +22,8 @@ Download the mod's `.hog` file and its `.hog.sha256` file from its latest releas
 the `mods` folder of your game folder, next to `resource.hog`. Then turn it on in OpenReliant's mods
 screen. OpenReliant checks the archive against its checksum as it loads it.
 
-To try the latest changes before they're released, copy the mod's folder from `mods/` into the
-same `mods` folder instead, keeping its name: `mods/viper` becomes `<game>/mods/viper`. The name
+To try the latest changes before they're released, copy the mod's own folder into the same `mods`
+folder instead, keeping its name: `mods/ships/fighters/viper` becomes `<game>/mods/viper`. The name
 matters: the game and the mod's scripts know what a mod adds by it, such as `viper:viper` for the
 Viper, and `viper.hog` gives the same names.
 
@@ -40,6 +40,19 @@ StarLancer/
 OpenReliant's [modding guide](https://github.com/OpenReliant/openreliant/blob/main/docs/guide/modding.md)
 says how mods work.
 
+## Adding a mod
+
+A mod is a folder with a `mod.ini`, in the folder of its category under [`mods/`](mods), such as
+`mods/ships/fighters/viper`. The folder's name is the mod's name, which its archive and its things
+are named after, so it must be the only mod of that name in the collection. Give it a `mod.png`
+thumbnail and a `license.txt` with its credits and licence, and open a pull request.
+
+Every other folder under `mods/` is a category, and a category can hold categories of its own,
+such as `ships/fighters/alliance`. Its `README.md` gives its name as its first heading and what goes
+in it as the paragraph after, and links to its own categories in the order the site lists them. A
+category with no mods yet still shows on the site, with none in it. To add a category, add a folder
+with its `README.md`, and link to it from the README of the category it's in.
+
 ## Releasing a mod
 
 A mod's version is the `Version` in its `mod.ini`. To release it, raise the version and push to
@@ -51,12 +64,14 @@ A mod's version is the `Version` in its `mod.ini`. To release it, raise the vers
    `.github/actions/sltool`;
 2. publishes the release `<mod>-v<version>`, such as `viper-v1.0`, with both files attached and
    the commits that changed the mod since its last release as its notes;
-3. rebuilds the [index page](https://openreliant.github.io/openreliant-mods/).
+3. rebuilds the [site](https://openreliant.github.io/openreliant-mods/): the mods by category, and
+   [the updates](https://openreliant.github.io/openreliant-mods/updates/), every release with what
+   changed in it, newest first.
 
 A version that has a release already is left alone, so other changes to `main` release nothing. On
-a pull request, the Check workflow packs every mod and builds the page, to catch a mod that doesn't
-pack. `python3 .github/scripts/release.py --dry-run` does the same locally, into `dist/`, and
-`python3 .github/scripts/site.py` writes the page into `site/`.
+a pull request, the Check workflow packs every mod and builds the site, to catch a mod that doesn't
+pack or isn't in a category. `python3 .github/scripts/release.py --dry-run` does the same locally,
+into `dist/`, and `python3 .github/scripts/site.py` writes the site into `site/`.
 
 ## Sources
 

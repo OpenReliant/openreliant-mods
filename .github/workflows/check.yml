@@ -1,4 +1,5 @@
-# Checks that every mod packs, and that the index page builds, before a change reaches main.
+# Checks that every mod packs and is in a category, and that the site builds, before a change
+# reaches main.
 name: Check
 
 on:

@@ -4,5 +4,5 @@
 `mod.png` is made from it with ImageMagick 7:
 
 ```bash
-magick -background none mod.svg ../../mods/instructor-shut-up/mod.png
+magick -background none mod.svg ../../mods/gameplay/instructor-shut-up/mod.png
 ```

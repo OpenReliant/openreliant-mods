@@ -1,10 +1,10 @@
 # Viper Mk II: sources
 
-What [`mods/viper`](../../mods/viper) is built from. The model is "Battlestar Galactica Viper Mark
+What [`mods/ships/fighters/viper`](../../mods/ships/fighters/viper) is built from. The model is "Battlestar Galactica Viper Mark
 2" by [LocoPixel](https://sketchfab.com/locopixel),
 [on Sketchfab](https://sketchfab.com/3d-models/battlestar-galactica-viper-mark-2-1bf9872a1e8d4b39a259e14a7015a0a2),
 under [CC-BY-NC-4.0](http://creativecommons.org/licenses/by-nc/4.0/); see the mod's
-[credits](../../mods/viper/license.txt) for what was changed.
+[credits](../../mods/ships/fighters/viper/license.txt) for what was changed.
 
 - `viper.gltf` and `scene.bin`: the model as Sketchfab exports it, under a node `viper` that scales
   and turns it to the game's axes, with marker nodes at the scene's root in the game's units: the
@@ -26,9 +26,9 @@ With OpenReliant's `sltool`, Python 3, ImageMagick 7 and Node.js, for
 cd worn && python3 make.py && cp hull_color.png hull_mr.png hull_normal.png ../textures/ && cd ..
 npx @gltf-transform/cli weld viper.gltf welded.glb
 npx @gltf-transform/cli simplify welded.glb viper.glb --ratio 0.3 --error 0.002
-sltool shp from-gltf viper.glb ../../mods/viper/viper.shp
-sltool shp obj ../../mods/viper/viper.shp viper.obj
-python3 hud.py viper.obj ../../mods/viper scem icon wire
+sltool shp from-gltf viper.glb ../../mods/ships/fighters/viper/viper.shp
+sltool shp obj ../../mods/ships/fighters/viper/viper.shp viper.obj
+python3 hud.py viper.obj ../../mods/ships/fighters/viper scem icon wire
 ```
 
 - `make.py` takes a minute and leaves its working pictures in `worn`.
