@@ -1,0 +1,23 @@
+StarLancer Prequel Missions
+
+This mod mixes two kinds of material, under two licences.
+
+The StarLancer trial's material is distributed under the trial's shareware terms.
+It is copyright Digital Anvil, Warthog and Microsoft, and was released free of
+charge on the StarLancer demo disc. It covers:
+
+  - the missions mission91.dte and mission92.dte, the trial's missions 1 and 2
+  - the speech files, DMS1_* and dms2_*
+  - the briefing movies prequel_m01.bik and prequel_m02.bik, the trial's
+    New_m01.bik and new_m02.bik renamed
+  - the ending picture blurb.png, the trial's blurb.tga
+  - the thumbnail mod.png, a picture OpenReliant drew of the trial's Naginata
+    and Yamato
+  - the trial's text that the scripts carry: the names, the objectives and the
+    ITAC's debriefings
+
+The mod's own work, its scripts menu.luau, records.luau and global.luau apart
+from the trial's text in them, is licensed under the Mozilla Public License 2.0:
+https://mozilla.org/MPL/2.0/
+
+This is a fan mod for OpenReliant, which needs a copy of StarLancer to play.
