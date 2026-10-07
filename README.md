@@ -5,8 +5,9 @@ of StarLancer's engine. Each mod here is checked by the OpenReliant maintainers:
 OpenReliant version its manifest names, and its licence lets you share it.
 
 You need OpenReliant and your own copy of StarLancer. No mod here holds the game's archives or its
-files as they ship. Some art packs rework the game's own models and textures, and work over your
-copy of the game all the same.
+files as they ship. Some art packs rework the game's own models and textures, and StarLancer
+Prequel Missions brings the free trial's two missions, with their lines and movies. They all work
+over your copy of the game.
 
 **[Browse and download the mods](https://openreliant.github.io/openreliant-mods/)**, by category,
 each from its latest release, and see [the latest updates](https://openreliant.github.io/openreliant-mods/updates/).
