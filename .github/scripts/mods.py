@@ -20,8 +20,9 @@ of the collection's mods, in the category it maps to. The mod is named after its
 the order number before it and the version after it: 30-coyote-worn-v4 is coyote-worn. Where two
 folders give one name, the one with the higher Version is the mod. Catalog, where the artist keeps
 one, names a JSON file listing their packs, as KonCyptFysh's does; then only the packs it marks
-available count. Name and Url stand in for a mod's Author and Url where its mod.ini leaves them
-out. A new pack, or a new version of one, needs only the pin moved.
+available count, and a pack's page on the site shows the in-game picture, the 3D model and the
+notes its entry gives. Name and Url stand in for a mod's Author and Url where its mod.ini leaves
+them out. A new pack, or a new version of one, needs only the pin moved.
 
     python3 .github/scripts/mods.py lfs-includes --packs|--thumbnails
 
@@ -32,6 +33,7 @@ thumbnails alone. The workflows fetch those and no others.
 from __future__ import annotations
 
 import configparser
+import functools
 import json
 import pathlib
 import re
@@ -41,6 +43,9 @@ import urllib.parse
 
 ROOT = pathlib.Path(__file__).resolve().parents[2]
 MODS = ROOT / "mods"
+SOURCES = ROOT / "sources"
+# The pictures a mod's page can show.
+PICTURES = (".png", ".jpg", ".jpeg", ".webp")
 EXTERNAL = ROOT / "external"
 REPOSITORY = "OpenReliant/openreliant-mods"
 
@@ -116,6 +121,27 @@ class Artist:
             found.append(Mod.kept(self, folders[0], name, category))
         return found, problems
 
+    @functools.cached_property
+    def listed(self) -> list[dict]:
+        """The packs the artist's catalogue lists, as the catalogue gives them; none where there's no
+        catalogue or it can't be read."""
+        if not self.catalog:
+            return []
+        try:
+            assets = json.loads((self.root / self.catalog).read_text(encoding="utf-8"))["assets"]
+        except (OSError, ValueError, KeyError, TypeError):
+            return []
+        return [asset for asset in assets if isinstance(asset, dict)]
+
+    def listing(self, files: pathlib.Path) -> dict | None:
+        """The catalogue's entry for the pack whose mod is in `files`, if the catalogue lists it."""
+        inside = files.relative_to(self.root).as_posix()
+        for asset in self.listed:
+            folder = str(asset.get("folder", "")).strip("/")
+            if folder and inside.startswith(folder + "/"):
+                return asset
+        return None
+
     def available(self, problems: list[str]) -> list[str] | None:
         """The folders of the packs the catalogue marks available; None where there's no catalogue."""
         if not self.catalog:
@@ -186,6 +212,21 @@ class Mod:
                     if re.match(pattern, name, re.IGNORECASE):
                         return "Credits and licence", self.artist.link("blob", (holder / name).as_posix())
         return "Source", self.source_page()
+
+    @property
+    def page(self) -> str:
+        """Its page on the site, from the site's top, such as mods/viper/."""
+        return f"mods/{self.id}/"
+
+    def screenshots(self) -> list[pathlib.Path]:
+        """The pictures its page shows besides its thumbnail: for a mod of the collection, those in
+        sources/<mod>/screenshots, in the order of their names."""
+        if self.artist:
+            return []
+        folder = SOURCES / self.id / "screenshots"
+        if not folder.is_dir():
+            return []
+        return sorted(path for path in folder.iterdir() if path.suffix.lower() in PICTURES)
 
     def lfs_pointers(self) -> list[pathlib.Path]:
         """Its files that are still Git LFS pointers, whose contents weren't fetched."""

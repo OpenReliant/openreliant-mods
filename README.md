@@ -53,7 +53,8 @@ says how mods work.
 A mod is a folder with a `mod.ini`, in the folder of its category under [`mods/`](mods), such as
 `mods/ships/fighters/viper`. The folder's name is the mod's name, which its archive and its things
 are named after, so it must be the only mod of that name in the collection. Give it a `mod.png`
-thumbnail and a `license.txt` with its credits and licence, and open a pull request.
+thumbnail and a `license.txt` with its credits and licence, and open a pull request. Pictures for
+its page on the site go in `sources/<mod>/screenshots`, as PNG, JPEG or WebP files.
 
 Every other folder under `mods/` is a category, and a category can hold categories of its own,
 such as `ships/fighters/alliance`. Its `README.md` gives its name as its first heading and what goes
@@ -96,6 +97,9 @@ each entry of `assets`, and the rest of the file is the artist's own:
 
 - `folder`: the folder of the repository that holds the mod's folder.
 - `status`: `available` for a mod that's out. Any other status leaves the mod out until it changes.
+- `preview`, `model` and `notes`, where an entry gives them: an in-game picture and a 3D model,
+  by their paths on the artist's site (`Url`), and a list of notes. The mod's page on the site
+  shows them.
 
 Without a catalogue, every mod of the repository is picked up.
 
