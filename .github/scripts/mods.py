@@ -20,8 +20,9 @@ of the collection's mods, in the category it maps to. The mod is named after its
 the order number before it and the version after it: 30-coyote-worn-v4 is coyote-worn. Where two
 folders give one name, the one with the higher Version is the mod. Catalog, where the artist keeps
 one, names a JSON file listing their packs, as KonCyptFysh's does; then only the packs it marks
-available count, and a pack's page on the site shows the in-game picture and the notes its entry
-gives. Name and Url stand in for a mod's Author and Url where its mod.ini leaves
+available count, each by the folder its entry names for the mod (modFolder), so that the artist's
+other folders with a mod.ini in a pack, such as a recipe or a test setup, don't, and a pack's page
+on the site shows the in-game picture and the notes its entry gives. Name and Url stand in for a mod's Author and Url where its mod.ini leaves
 them out. A new pack, or a new version of one, needs only the pin moved.
 
     python3 .github/scripts/mods.py lfs-includes --packs|--thumbnails
@@ -104,7 +105,7 @@ class Artist:
         for manifest in sorted(self.root.rglob("mod.ini")):
             folder = manifest.parent
             inside = folder.relative_to(self.root).as_posix()
-            if available is not None and not any(inside.startswith(listed + "/") for listed in available):
+            if available is not None and not any(inside.startswith(pack + "/") and mod in (None, folder.name) for pack, mod in available):
                 continue
             named.setdefault(mod_name(folder.name), []).append(folder)
         found: list[Mod] = []
@@ -142,13 +143,15 @@ class Artist:
                 return asset
         return None
 
-    def available(self, problems: list[str]) -> list[str] | None:
-        """The folders of the packs the catalogue marks available; None where there's no catalogue."""
+    def available(self, problems: list[str]) -> list[tuple[str, str | None]] | None:
+        """The packs the catalogue marks available, each as its folder and the name of its mod's
+        folder in it (modFolder), or None where its entry names none, which counts every mod in the
+        pack's folder; None where there's no catalogue."""
         if not self.catalog:
             return None
         try:
             listed = json.loads((self.root / self.catalog).read_text(encoding="utf-8"))
-            return [asset["folder"].strip("/") for asset in listed["assets"] if asset.get("status") == "available"]
+            return [(asset["folder"].strip("/"), asset.get("modFolder") or None) for asset in listed["assets"] if asset.get("status") == "available"]
         except (OSError, ValueError, KeyError, TypeError, AttributeError) as err:
             problems.append(f"{self.ini}: {self.submodule}/{self.catalog} can't be read as a catalogue: {err}")
             return []
