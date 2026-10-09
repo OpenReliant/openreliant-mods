@@ -1,7 +1,8 @@
 """Writes the mods' site into site/: the index page, which browses the mods by category, with each
 mod's thumbnail, name, version, author, what it needs, its description and the download of its
 latest release; a page for each mod, mods/<mod>/, with its pictures, what it is, its download and
-its releases; and updates/, every mod's releases, newest first.
+its releases; updates/, every mod's releases, newest first; and mods.json, the released mods as
+data, which OpenReliant's GET MODS screen reads to list and install them from the game.
 
     python3 .github/scripts/site.py
 """
@@ -15,9 +16,14 @@ import shutil
 import subprocess
 import sys
 
-from mods import ROOT, REPOSITORY, Category, all_categories, git, problems, tree, version_tuple
+from mods import ROOT, REPOSITORY, Category, Mod, all_categories, git, problems, tree, version_tuple
 
 SITE = ROOT / "site"
+# The site's address. mods.json uses absolute links, since the game reads it from anywhere.
+SITE_URL = "https://openreliant.github.io/openreliant-mods/"
+# The format number of mods.json. Raise it when a key changes meaning. Adding a key doesn't need
+# it: OpenReliant ignores keys it doesn't know.
+INDEX_FORMAT = 1
 
 STYLE = """
 /* Newtown, by Roger White, from Roger's Fonts: the face OpenReliant draws the game's menus in, from
@@ -651,6 +657,40 @@ def updates_page(root: Category, releases: list[dict], updated: str) -> str:
     return page("Updates: OpenReliant mods", "The latest releases of the mods for OpenReliant.", "updates", "../", body, [])
 
 
+def index_json(mods: list[Mod], releases: list[dict], updated_at: dict[str, str], updated: str) -> str:
+    """mods.json: every mod that has a release, in its latest version, with what its card shows and
+    the links to its archive and its checksum file. OpenReliant's GET MODS screen reads it to list
+    and install the mods from the game. The game's documentation defines the keys
+    (docs/guide/modding.md, "The catalogue's format"). Mods that aren't released yet, and keys
+    without a value, are left out."""
+    # Each asset's size, by its release's tag and its name.
+    sizes: dict[tuple[str, str], int] = {}
+    for release in releases:
+        for asset in release["assets"]:
+            sizes[(release["tag"], asset["name"])] = asset["size"]
+    listed = []
+    for mod in sorted(mods, key=lambda mod: mod.id):
+        if not mod.released():
+            continue
+        entry = {
+            "id": mod.id,
+            "name": mod.name,
+            "category": mod.category,
+            "version": mod.version,
+            "author": mod.author,
+            "description": mod.description,
+            "openreliant": mod.needs,
+            "updated": updated_at.get(mod.id, ""),
+            "size": sizes.get((mod.tag, mod.archive)),
+            "archive": mod.download(),
+            "checksum": mod.download() + ".sha256",
+            "thumbnail": f"{SITE_URL}thumbs/{mod.id}.png" if mod.thumbnail else None,
+            "url": SITE_URL + mod.page,
+        }
+        listed.append({key: value for key, value in entry.items() if value not in ("", None)})
+    return json.dumps({"format": INDEX_FORMAT, "generated": updated, "mods": listed}, indent=2, ensure_ascii=False) + "\n"
+
+
 def main() -> int:
     root = tree()
     if found := problems(root):
@@ -673,6 +713,7 @@ def main() -> int:
     updated = git("log", "-1", "--format=%cs")
     (SITE / "index.html").write_text(index_page(root, release, updated_at, updated), encoding="utf-8")
     (SITE / "updates" / "index.html").write_text(updates_page(root, releases, updated), encoding="utf-8")
+    (SITE / "mods.json").write_text(index_json(mods, releases, updated_at, updated), encoding="utf-8")
     by_path = {category.path: category for category in all_categories(root)}
     for mod in mods:
         folder = SITE / mod.page
@@ -680,7 +721,7 @@ def main() -> int:
         for picture in mod.screenshots():
             shutil.copy(picture, folder / picture.name)
         (folder / "index.html").write_text(mod_page(mod, by_path, release, releases, updated_at.get(mod.id, ""), updated), encoding="utf-8")
-    print(f"wrote {SITE / 'index.html'}, {SITE / 'updates' / 'index.html'} and a page for each mod: {len(mods)} mods, {len(releases)} releases")
+    print(f"wrote {SITE / 'index.html'}, {SITE / 'updates' / 'index.html'}, {SITE / 'mods.json'} and a page for each mod: {len(mods)} mods, {len(releases)} releases")
     return 0
 
 
