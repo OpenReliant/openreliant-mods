@@ -1,0 +1,22 @@
+Cut Dreamcast Missions
+
+Restored cut missions found on the Dreamcast version of StarLancer: missions 12, 13, 17 and 22,
+back in their places in the campaign.
+
+Credits
+
+- The missions: Digital Anvil and Warthog. The mission files are the Dreamcast disc's, unchanged.
+- The thumbnail, mod.png: the Dreamcast box art, by Crave Entertainment and Ubi Soft, titled in
+  Newtown, a public domain font by Roger White.
+- The reconstruction (the scripts of the radio lines, Enriquez's briefings and the debriefings in
+  the documents beside this file): OpenReliant, from the game's own files. The documents say what
+  comes from the game and what was written for the mod.
+- The voices: the radio lines generated with F5-TTS (https://github.com/SWivid/F5-TTS, model
+  weights under CC BY-NC 4.0), and Enriquez's briefings with Chatterbox by Resemble AI
+  (https://github.com/resemble-ai/chatterbox, MIT), which marks what it makes with an inaudible
+  watermark. Each voice is cloned from that character's recorded lines in the game. They are
+  AI-generated, not recordings of the original cast.
+- The scripts (campaign.luau, faces.luau, radio22.luau, radio22_lines.luau, yamato22.luau, targets22.luau, fixes22.luau):
+  OpenReliant, under the MPL 2.0.
+
+The mod is free, for non-commercial use, and needs your own copy of StarLancer.
