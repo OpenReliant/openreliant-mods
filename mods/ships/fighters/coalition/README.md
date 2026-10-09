@@ -1,3 +1,3 @@
 # Coalition
 
-The Coalition's fighters, such as the Sabre and the Kamov.
+The Coalition's fighters, such as the Sabre and the Loki.

@@ -4,3 +4,4 @@ Fighters, bombers and interceptors. A fighter from outside the game's two sides 
 
 - [Alliance](alliance)
 - [Coalition](coalition)
+- [Torpedo bombers](torpedo-bombers)
