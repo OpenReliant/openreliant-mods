@@ -1,0 +1,10 @@
+Jukebox, a mod for OpenReliant
+==============================
+
+By OpenReliant, under the Mozilla Public License 2.0.
+
+Its thumbnail, mod.png, and the pictures for its page are frames of the game's CD player as
+OpenReliant draws it with the mod, so they show the game's art, by Digital Anvil. The thumbnail is
+titled in Newtown, a public domain font by Roger White. sources/jukebox says how they were made.
+
+The mod is free, and needs your own copy of StarLancer.
