@@ -2,7 +2,8 @@
 
 Mods for [OpenReliant](https://github.com/OpenReliant/openreliant), the open-source reimplementation
 of StarLancer's engine. Each mod here is checked by the OpenReliant maintainers: it works with the
-OpenReliant version its manifest names, and its licence lets you share it.
+OpenReliant version its manifest names, and its licence or its author's permission lets the
+collection offer it.
 
 You need OpenReliant and your own copy of StarLancer. No mod here holds the PC game's archives or its
 files as they ship. Some art packs rework the game's own models and textures, StarLancer Prequel
@@ -59,6 +60,17 @@ are named after, so it must be the only mod of that name in the collection. Give
 thumbnail and a `license.txt` with its credits and licence, and open a pull request. Pictures for
 its page on the site go in `sources/<mod>/screenshots`, as PNG, JPEG or WebP files. The page shows
 them after the thumbnail, in the order of their names.
+
+FLAC files go in Git LFS (`.gitattributes`), so that a clone doesn't have to fetch every recording:
+with Git LFS installed, `git add` stores them there. To clone without them, then fetch one mod's:
+
+```sh
+GIT_LFS_SKIP_SMUDGE=1 git clone https://github.com/OpenReliant/openreliant-mods.git
+git lfs pull --include "mods/sound/master-recordings/**"
+```
+
+The workflows fetch them too, cached by their contents, so that each version of them costs the
+repository's LFS bandwidth once.
 
 Every other folder under `mods/` is a category, and a category can hold categories of its own,
 such as `ships/fighters/alliance`. Its `README.md` gives its name as its first heading and what goes

@@ -1,0 +1,19 @@
+name: lfs
+description: >-
+  Fetches the Git LFS files of the collection's own mods, cached by their contents, so that each
+  version of them costs the repository's LFS bandwidth once.
+runs:
+  using: composite
+  steps:
+    # The checkout leaves the files as pointers, which name their contents.
+    - id: files
+      shell: bash
+      run: echo "key=$(git lfs ls-files --long | sha256sum | cut -c1-16)" >> "$GITHUB_OUTPUT"
+    # The files fetched for these contents, or for the last ones, which new contents mostly share.
+    - uses: actions/cache@v4
+      with:
+        path: .git/lfs/objects
+        key: lfs-${{ steps.files.outputs.key }}
+        restore-keys: lfs-
+    - shell: bash
+      run: git lfs pull

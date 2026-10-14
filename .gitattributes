@@ -1,0 +1,2 @@
+# Lossless audio is kept in Git LFS, so that a clone doesn't have to fetch every recording.
+*.flac filter=lfs diff=lfs merge=lfs -text
