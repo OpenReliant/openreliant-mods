@@ -1,0 +1,23 @@
+Master Recordings, a mod for OpenReliant
+========================================
+
+The music of StarLancer, composed by Ian Livingstone, from his original 44.1 kHz master
+recordings. Dave Blinston was the audio producer at Warthog.
+
+The recordings remain Ian Livingstone's work, and they aren't under an open licence. On
+13 October 2026 he gave his permission to make them available as a mod for OpenReliant that
+installs with a single click, as this collection offers it. OpenReliant's maintainer keeps his
+written reply.
+
+OpenReliant cut each piece from its master at the start and length of the game's own piece, so
+that it loops back where the game's does, and raised its level towards the game's as far as the
+master's peaks allowed. The recordings are otherwise unchanged. Takeoff and Searching Mission 10
+stay the game's own: no master holds Takeoff, and Searching Mission 10's master is a different
+version of the piece.
+
+The CD player's tracks after its 24 play the masters in full, the files named Masters_: the
+pieces of the game that it doesn't list, The Search Part 10 (the master of Searching Mission 10),
+the music of the movies, and the characters' themes. Each is raised towards the level of the
+game's music as far as its peaks allow, and is otherwise unchanged. The album's Reliant Funeral
+and Ending have the movies' sounds and voices mixed in, so these two come from the masters of the
+music alone.
