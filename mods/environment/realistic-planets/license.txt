@@ -14,7 +14,7 @@ pictures and the global mosaic of NASA/JPL and Paul Schenk of the Lunar and Plan
 from the USGS Astrogeology Science Center, in the public domain, Earth's from NASA Goddard Space
 Flight Center's Blue Marble (Reto Stöckli, Robert Simmon), NASA Earth Observatory's Black Marble
 (Joshua Stevens, Miguel Román) and NOAA's GOES-18 and GOES-19 pictures, in the public domain, and
-Mars's from ESA/DLR/FU Berlin's HRSC global colour mosaics, with that credit, and NASA/JPL/Arizona
+Mars's from ESA/DLR/FU Berlin's HRSC global colour mosaics, under CC BY, and NASA/JPL/Arizona
 State University's TES albedo map, in the public domain, and the Moon's and its normal map from
 NASA/GSFC/Arizona State University's LROC colour mosaic and NASA/GSFC's LOLA maps, in the public
 domain.

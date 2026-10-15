@@ -8,10 +8,11 @@ folder.
 
 **Status:** every body the game has is done: Neptune and Triton, Uranus, Saturn and Titan, Jupiter
 and its moons Io, Europa, Ganymede and Callisto, Earth and Venus. The mod adds Mars and the Moon,
-which the game doesn't have. The mod needs OpenReliant 0.12. Each body is lit by Minnaert's law in full, Saturn and
-its ring shade each other, Earth is a planet with its city lights on its night side, every planet and
-Titan has its haze, air or dust and a backlit crescent ([The haze](#the-haze)), the Moon shows its
-relief along the terminator, and every body turns and leans as it really does, sixty times as fast.
+which the game doesn't have. The mod needs OpenReliant 0.12. Each body is lit by the law of light
+measured for it, Saturn and its ring shade each other, Earth is a planet with its city lights on its
+night side, every planet and Titan has its haze, air or dust and a backlit crescent
+([The haze](#the-haze)), the Moon shows its relief along the terminator, and every body turns and
+leans as it really does, sixty times as fast.
 
 ## The game's planets
 
@@ -862,14 +863,14 @@ map, and its colour from Mars's measured spectrum, each checked against Hubble's
 
 | Source | What it is | Licence | Used |
 |---|---|---|---|
-| [HRSC's global colour mosaics](https://hrscteam.dlr.de/public/data/globalcolor.php) (G. G. Michael and others, 2025) | Mars Express's pictures from high above Mars in its blue, green, red, near-infrared and panchromatic filters, each mosaicked as reflectance at 2 km a pixel, scaled to one well-calibrated observation | Credit ESA/DLR/FU Berlin | Yes, the blue, green and red mosaics, at 440, 530 and 750 nm, for the detail and the south polar cap |
+| [HRSC's global colour mosaics](https://hrscteam.dlr.de/public/data/globalcolor.php) (G. G. Michael and others, 2025) | Mars Express's pictures from high above Mars in its blue, green, red, near-infrared and panchromatic filters, each mosaicked as reflectance at 2 km a pixel, scaled to one well-calibrated observation | [CC BY](https://doi.org/10.17169/refubium-40624) (ESA/DLR/FU Berlin) | Yes, the blue, green and red mosaics, at 440, 530 and 750 nm, for the detail and the south polar cap |
 | [TES's albedo map](http://tes.mars.asu.edu/products/) (P. R. Christensen and others, 2001) | MGS's bolometric Lambert albedo, 8 pixels a degree | Public domain (NASA/JPL/Arizona State University) | Yes, for the broad markings and the north polar cap |
 | Hubble's WFPC2 frames of programme 10065, "Mars at Closest Approach", through [MAST](https://archive.stsci.edu/) | Calibrated frames of Mars on 26 and 27 August 2003, at 410, 502, 588, 631 and 673 nm, about 12 km a pixel | Public (NASA/ESA) | Yes, nine frames, for the limb, the markings' contrast and the polar cap's colour |
 | A. Mallama, B. Krobusek and H. Pavlov (2017) | Mars's geometric albedo in the Johnson-Cousins and Sloan filters | Published values | For the colour |
 | [The USGS's Viking colour mosaic](https://astrogeology.usgs.gov/search/map/mars_viking_global_color_mosaic_925m) | Viking's red and violet pictures at 925 m a pixel, with a green made from their mean | Public domain | No: its green is made up |
 | [Tianwen-1's colour map](https://dc.g-vo.org/rr/q/lp/custom/CDS/P/Mars/Tianwen1-MoRIC) (J. Liu and others, 2024) | A true-colour map at 76 m a pixel | No licence stated | No: it states no licence, and its download needs an account |
 | The Emirates Mars Mission's EXI | Calibrated pictures of the whole disk at 437, 546 and 635 nm | | No: its data needs an account |
-| HRSC's panchromatic mosaic | The same as HRSC's others, through a broad filter round 675 nm | Credit ESA/DLR/FU Berlin | No: its scale doesn't match its colour filters' |
+| HRSC's panchromatic mosaic | The same as HRSC's others, through a broad filter round 675 nm | CC BY (ESA/DLR/FU Berlin) | No: its scale doesn't match its colour filters' |
 
 ### The map
 
@@ -1183,10 +1184,11 @@ again.
 - Venus's and Mars's albedos and Venus's phase curves: A. Mallama, B. Krobusek and H. Pavlov,
   "Comprehensive wide-band magnitudes and albedos for the planets, with applications to exo-planets
   and Planet Nine", Icarus 282 (2017).
-- HRSC's global colour mosaics of Mars: credit ESA/DLR/FU Berlin; G. G. Michael and others, "A global
-  colour mosaic of Mars from Mars Express HRSC high altitude observations", Icarus 425, 116350
-  (2025), [doi:10.1016/j.icarus.2024.116350](https://doi.org/10.1016/j.icarus.2024.116350), from the
-  HRSC team's public data at the Freie Universität Berlin.
+- HRSC's global colour mosaics of Mars: ESA/DLR/FU Berlin, CC BY, from the HRSC team's public data
+  at the Freie Universität Berlin, [doi:10.17169/refubium-40624](https://doi.org/10.17169/refubium-40624);
+  G. G. Michael and others, "A global colour mosaic of Mars from Mars Express HRSC high altitude
+  observations", Icarus 425, 116350 (2025),
+  [doi:10.1016/j.icarus.2024.116350](https://doi.org/10.1016/j.icarus.2024.116350).
 - TES's albedo map of Mars: NASA/JPL/Arizona State University, in the public domain, from the TES
   node at Arizona State University; P. R. Christensen and others, "Mars Global Surveyor Thermal
   Emission Spectrometer experiment: investigation description and surface science results", Journal
