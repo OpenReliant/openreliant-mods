@@ -43,6 +43,16 @@ python3 sphere.py "$work/earth.obj" --radius 1048542 --centre -752661.5 5579.5 -
     --name earth
 "$sltool" shp from-obj "$work/earth.obj" "$mod/earth.shp"
 
+# Mars isn't in the game, so its sphere has the radius of the game's planets, with Mars's polar radius
+# of 3,376.2 km to its equator's 3,396.2 (IAU). It's a single model, as Earth's is.
+python3 sphere.py "$work/mars.obj" --radius 1280625 --polar 1273083 --texture realistic_planets_mars --name mars
+"$sltool" shp from-obj "$work/mars.obj" "$mod/mars.shp"
+
+# The Moon isn't in the game either, so its sphere has the radius of the game's moons, which against
+# Earth's sphere is the real Moon's size against Earth's. It's round, and a single model.
+python3 sphere.py "$work/luna.obj" --radius 288141 --texture realistic_planets_luna --name luna
+"$sltool" shp from-obj "$work/luna.obj" "$mod/luna.shp"
+
 # Saturn and its ring, at their real proportions: radii of 60,268 and 54,364 km (IAU), and the ring
 # from 74,000 to 141,000 km, as its texture is. They're scaled so that the A ring's outer edge,
 # 136,770 km out, falls where the original's ring ends, 4,640,000 units out, which is 33.93 units a
@@ -57,49 +67,54 @@ python3 sphere.py "$work/saturn_lo.obj" --radius 2020365 --polar 1822445 --textu
 
 # The thumbnail: the planets in a row, in their order out from the sun, and their moons below them in
 # the same order. Venus from 10 degrees north, facing the bright clouds north of its equator, Earth
-# facing Africa and Europe, Jupiter facing its Great Red Spot, Saturn and its ring from 25 degrees
-# north, Uranus from the north it shows now and Neptune facing its Great Dark Spot; then Jupiter's
-# moons from the inside out, Io facing Pele and Loki, Europa its trailing side, Ganymede facing
+# facing Africa and Europe, Mars facing Valles Marineris, Jupiter facing its Great Red Spot, Saturn and its ring from 25 degrees
+# north, Uranus from the north it shows now and Neptune facing its Great Dark Spot; then the Moon
+# facing Earth, Jupiter's moons from the inside out, Io facing Pele and Loki, Europa its trailing side, Ganymede facing
 # Galileo Regio and Callisto facing Valhalla, Titan facing Xanadu and Triton from 30 degrees south,
 # facing the ground Voyager 2 saw best. Each is lit from the upper left, in white light, as if
 # the sun stood 10 degrees above the viewer and 15 to the left, so that its night side just begins at
 # its lower right edge, and its limb shows as the mod draws it: each channel with the exponent
-# `planets.luau` gives it, held at its least cosine. Saturn's sun stands 27 degrees north, the most it
+# `planets.luau` gives it, held at its least cosine, and the Moon with an exponent of 0.5, as its
+# lunar-Lambert law has it so near full Moon, without its relief. Saturn's sun stands 27 degrees north, the most it
 # does, and 20 degrees to the left, so that its night side begins at its right edge, where its ring
 # doesn't hide it, and its shadow falls on the ring behind it, as the ring's shadow falls on its
-# south, as the game draws them. They're flattened as their spheres are, the planets 90 pixels across
-# and the moons 72. Each is drawn at four times its size and scaled down, so that the texture doesn't
+# south, as the game draws them. They're flattened as their spheres are, the planets 76 pixels across
+# and the moons 64. Each is drawn at four times its size and scaled down, so that the texture doesn't
 # alias.
-python3 render.py "$mod/realistic_planets_venus.png" "$work/venus.png" --size 360 --lat 10 --lon 45 \
+python3 render.py "$mod/realistic_planets_venus.png" "$work/venus.png" --size 304 --lat 10 --lon 45 \
     --sun-lat 20 --sun-lon 30 --k 1.070 1.077 0.982 --least 0.25
-python3 render.py "$mod/realistic_planets_earth.png" "$work/earth.png" --size 360 --lat 10 --lon 15 \
+python3 render.py "$mod/realistic_planets_earth.png" "$work/earth.png" --size 304 --lat 10 --lon 15 \
     --sun-lat 20 --sun-lon 0 --k 0.871 0.815 0.750 --least 0.25
-python3 render.py "$mod/realistic_planets_jupiter.png" "$work/jupiter.png" --size 360 --lat -15 --lon -46 \
+python3 render.py "$mod/realistic_planets_mars.png" "$work/mars.png" --size 304 --lat 10 --lon -60 \
+    --sun-lat 20 --sun-lon -75 --k 0.630 0.591 0.511 --least 0.2 --polar 0.9941
+python3 render.py "$mod/realistic_planets_jupiter.png" "$work/jupiter.png" --size 304 --lat -15 --lon -46 \
     --sun-lat -5 --sun-lon -61 --k 0.988 0.965 0.905 --least 0.25 --polar 0.9351
 python3 render.py "$mod/realistic_planets_saturn.png" "$work/saturn.png" --size 560 --aspect 1.536 --extent 1.556 \
     --lat 25 --lon 30 --sun-lat 27 --sun-lon 10 --k 0.770 0.697 0.540 --least 0.25 --polar 0.9020 \
     --ring "$mod/realistic_planets_saturn_rings.png" 1.2279 2.3396
-python3 render.py "$mod/realistic_planets_uranus.png" "$work/uranus.png" --size 360 --lat 35 --lon 0 \
+python3 render.py "$mod/realistic_planets_uranus.png" "$work/uranus.png" --size 304 --lat 35 --lon 0 \
     --sun-lat 45 --sun-lon -15 --k 0.702 0.805 0.850 --least 0.25 --polar 0.9771
-python3 render.py "$mod/realistic_planets_neptune.png" "$work/neptune.png" --size 360 --lat -25 --lon 37 \
+python3 render.py "$mod/realistic_planets_neptune.png" "$work/neptune.png" --size 304 --lat -25 --lon 37 \
     --sun-lat -15 --sun-lon 22 --k 0.680 0.712 0.768 --least 0.25
-python3 render.py "$mod/realistic_planets_io.png" "$work/io.png" --size 288 --lat 5 --lon 100 \
+python3 render.py "$mod/realistic_planets_luna.png" "$work/luna.png" --size 256 --lat 0 --lon 0 \
+    --sun-lat 10 --sun-lon -15 --k 0.5
+python3 render.py "$mod/realistic_planets_io.png" "$work/io.png" --size 256 --lat 5 --lon 100 \
     --sun-lat 15 --sun-lon 85 --k 0.685 0.688 0.697 --least 0.2
-python3 render.py "$mod/realistic_planets_europa.png" "$work/europa.png" --size 288 --lat 5 --lon 90 \
+python3 render.py "$mod/realistic_planets_europa.png" "$work/europa.png" --size 256 --lat 5 --lon 90 \
     --sun-lat 15 --sun-lon 75 --k 0.669 0.670 0.663 --least 0.2
-python3 render.py "$mod/realistic_planets_ganymede.png" "$work/ganymede.png" --size 288 --lat 10 --lon -160 \
+python3 render.py "$mod/realistic_planets_ganymede.png" "$work/ganymede.png" --size 256 --lat 10 --lon -160 \
     --sun-lat 20 --sun-lon -175 --k 0.580 0.561 0.539 --least 0.2
-python3 render.py "$mod/realistic_planets_callisto.png" "$work/callisto.png" --size 288 --lat 15 --lon -56 \
+python3 render.py "$mod/realistic_planets_callisto.png" "$work/callisto.png" --size 256 --lat 15 --lon -56 \
     --sun-lat 25 --sun-lon -71 --k 0.578 0.563 0.532 --least 0.2
-python3 render.py "$mod/realistic_planets_titan.png" "$work/titan.png" --size 288 --lat 15 --lon -100 \
+python3 render.py "$mod/realistic_planets_titan.png" "$work/titan.png" --size 256 --lat 15 --lon -100 \
     --sun-lat 25 --sun-lon -115 --k 0.877 0.892 0.876 --least 0.25
-python3 render.py "$mod/realistic_planets_triton.png" "$work/triton.png" --size 288 --lat -30 --lon 0 \
+python3 render.py "$mod/realistic_planets_triton.png" "$work/triton.png" --size 256 --lat -30 --lon 0 \
     --sun-lat -20 --sun-lon -15 --k 0.741 0.744 0.750 --least 0.2
-magick \( "$work/venus.png" "$work/earth.png" "$work/jupiter.png" -colorspace RGB -resize 90x90 -colorspace sRGB \
-    -background black -gravity center -extent 97x140 \) \
-    \( "$work/saturn.png" -colorspace RGB -resize 215x140 -colorspace sRGB -background black -gravity center -extent 215x140 \) \
-    \( "$work/uranus.png" "$work/neptune.png" -colorspace RGB -resize 90x90 -colorspace sRGB -background black \
-    -gravity center -extent 97x140 \) +append \
-    \( "$work/io.png" "$work/europa.png" "$work/ganymede.png" "$work/callisto.png" "$work/titan.png" "$work/triton.png" \
-    -colorspace RGB -resize 72x72 -colorspace sRGB -background black -gravity center -extent 116x140 +append \
-    -extent 700x140 \) -append +repage -define png:exclude-chunks=date,time "$mod/mod.png"
+magick \( "$work/venus.png" "$work/earth.png" "$work/mars.png" "$work/jupiter.png" -colorspace RGB -resize 76x76 \
+    -colorspace sRGB -background black -gravity center -extent 81x140 \) \
+    \( "$work/saturn.png" -colorspace RGB -resize 214x140 -colorspace sRGB -background black -gravity center -extent 214x140 \) \
+    \( "$work/uranus.png" "$work/neptune.png" -colorspace RGB -resize 76x76 -colorspace sRGB -background black \
+    -gravity center -extent 81x140 \) +append \
+    \( "$work/luna.png" "$work/io.png" "$work/europa.png" "$work/ganymede.png" "$work/callisto.png" "$work/titan.png" \
+    "$work/triton.png" -colorspace RGB -resize 64x64 -colorspace sRGB -background black -gravity center -extent 100x140 \
+    +append \) -append +repage -define png:exclude-chunks=date,time "$mod/mod.png"
