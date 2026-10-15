@@ -1,7 +1,8 @@
 -- Realistic Planets: sets how each body turns and leans in OpenReliant's table of planets
 -- (records.planets), makes the planets' light white, sets the rings that the haze beyond the disk
 -- of each planet and Titan is drawn on, makes Earth a planet, so that only the sun lights it,
--- like the others, and adds Mars. This is a load script, so it runs once as OpenReliant starts.
+-- like the others, and adds Mars and the Moon. This is a load script, so it runs once as
+-- OpenReliant starts.
 
 local records = require("openreliant.records")
 
@@ -21,7 +22,8 @@ local TIME_SCALE = 60
 -- according to Akatsuki's maps, much faster than the ground under them. A moon turns once per
 -- orbit and leans like its planet, since it orbits in the plane of the planet's equator. Triton's
 -- north pole is about 30 degrees from the solar system's, and it turns westward, the same way it
--- orbits Neptune.
+-- orbits Neptune. The Moon orbits close to the plane of Earth's orbit instead, and its pole leans
+-- 6.68 degrees from its orbit's.
 local BODIES = {
     neptune = { day = 16.11, tilt = 28.32, haze = { surface = "neptune_haze", inner = 0.98, outer = 1.014 } },
     triton = { day = -141.04, tilt = 30 },
@@ -36,6 +38,7 @@ local BODIES = {
     venus = { day = -120, tilt = 2.64, haze = { surface = "venus_haze", inner = 0.98, outer = 1.012 } },
     earth = { day = 23.934, tilt = 23.44, haze = { surface = "earth_haze", inner = 0.98, outer = 1.026 } },
     mars = { day = 24.623, tilt = 25.19, haze = { surface = "mars_haze", inner = 0.98, outer = 1.07 } },
+    luna = { day = 655.72, tilt = 6.68 },
 }
 
 -- Which way each north pole leans: toward the body's left, -X, in the orientation the mission gives
@@ -78,12 +81,17 @@ end
 planets[#planets + 1] = { type = "earth" }
 apply(planets[#planets], BODIES.earth)
 
--- Mars, the type this mod adds in mod.ini. The records take it by its qualified name, after the
--- mod's folder or archive, realistic-planets. In a folder of another name the name isn't found;
--- Mars then keeps Venus's entry, its base's, and the rest of this script still counts.
-local named = pcall(function()
-    planets[#planets + 1] = { type = "realistic-planets:mars" }
-end)
-if named then
-    apply(planets[#planets], BODIES.mars)
+-- Mars and the Moon, the types this mod adds in mod.ini. The records take them by their qualified
+-- names, after the mod's folder or archive, realistic-planets. In a folder of another name the
+-- names aren't found; each then keeps its base's entry, Venus's or Europa's, and the rest of this
+-- script still counts.
+local function add(name)
+    local named = pcall(function()
+        planets[#planets + 1] = { type = "realistic-planets:" .. name }
+    end)
+    if named then
+        apply(planets[#planets], BODIES[name])
+    end
 end
+add("mars")
+add("luna")

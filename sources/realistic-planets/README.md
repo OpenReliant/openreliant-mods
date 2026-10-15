@@ -54,10 +54,13 @@ Run each script from its own folder, in this order:
    Mars from 2003, about 790 MB, into `mars/data`, prints the limb's exponents for `planets.luau`, and
    the markings' contrast and the south cap's brightness for `mars/compose.py`, and makes
    `realistic_planets_mars.png`. It takes about three minutes.
-10. `build.sh` builds the spheres, Saturn's with its ring, with `sphere.py` and `sltool shp
+10. `luna/build.sh` downloads LROC's colour mosaic and LOLA's heights and albedo, about 3.6 GB, into
+   `luna/data`, and makes `realistic_planets_luna.png` and its normal map,
+   `realistic_planets_luna_normal.png`. It takes about a minute.
+11. `build.sh` builds the spheres, Saturn's with its ring, with `sphere.py` and `sltool shp
    from-obj`, and the thumbnail, `mod.png`, with `render.py`. Set `SLTOOL` if `sltool` isn't on your
    `PATH`.
-11. `paper/build.sh` makes the note's figures with `paper/figures.py` and typesets
+12. `paper/build.sh` makes the note's figures with `paper/figures.py` and typesets
    `paper/neptune.tex` into `neptune-voyager-map.pdf` in the mod's folder. `figures.py` also prints
    every number the note quotes, so that a new build can be checked against the text.
 
@@ -113,6 +116,10 @@ Run each script from its own folder, in this order:
 | `mars/spectrum.py` | Mars's geometric albedo spectrum from Mallama's albedos |
 | `mars/hubble.py` | Fits each Hubble frame's pointing against the HRSC mosaics, and measures the limb's exponents, how strongly the markings follow the TES map's, and the south cap's brightness |
 | `mars/compose.py` | Composes the texture from the HRSC mosaics' detail, the TES map's broad markings and the spectrum, with the polar caps |
+| `luna/fetch.py` | Downloads LROC's colour mosaic and LOLA's heights and albedo |
+| `luna/maps.py` | Reads LROC's mosaic and LOLA's maps onto a texture's grid, shared by the Moon's scripts |
+| `luna/compose.py` | Composes the texture from LROC's mosaic, with LOLA's albedo at the poles |
+| `luna/normals.py` | Makes the normal map from LOLA's heights |
 | `paper/neptune.tex` | The note |
 | `paper/figures.py` | The note's figures and numbers |
 
@@ -123,13 +130,15 @@ make them again.
 ## Screenshots
 
 The mod's page shows these pictures after its thumbnail, in the order of their names. They are taken
-in OpenReliant 0.12 with the default settings, so with the bloom and without the flight display,
+in OpenReliant 0.12, Mars's and the Moon's in 0.17, with the default settings, so with the bloom and
+without the flight display,
 from a camera placed at a chosen phase angle from the sun. Each view is rendered at 3840 by 2160
 and scaled down to 1920 by 1080; a picture of four views puts four renders together.
 
-No mission places Io, Europa, Callisto or Earth. For their pictures, a local helper mod loaded
-after this one gives Ganymede in mission 83 the model of Io, Europa or Callisto, and Venus in
-mission 30 Earth's model, with Earth's air and lean in Venus's planet record.
+No mission places Io, Europa, Callisto, Earth, Mars or the Moon. For their pictures, a local helper
+mod loaded after this one gives Ganymede in mission 83 the model of Io, Europa, Callisto or the
+Moon, and Venus in mission 30 Earth's or Mars's model, with that body's air or dust, turn and lean in
+the planet record.
 
 | File | What it shows |
 |---|---|
@@ -149,3 +158,7 @@ mission 30 Earth's model, with Earth's air and lean in Venus's planet record.
 | `screenshots/14-earth-night.png` | Earth's city lights, in Venus's place in mission 30, at 115 degrees of phase, from 2.4 times its radius |
 | `screenshots/15-crescents.png` | Backlit crescents: Venus in mission 30 at 125 degrees of phase, Uranus in mission 11 at 120, Jupiter in mission 27 at 130 and Neptune in mission 3 at 130 |
 | `screenshots/16-titan-phases.png` | Titan in mission 25 at 30, 100, 150 and 165 degrees of phase, from 3.8 times its radius |
+| `screenshots/17-mars.png` | Mars, in Venus's place in mission 30, at 60 degrees of phase, from 2.4 times its radius |
+| `screenshots/18-mars-backlit.png` | Mars's dust lit from behind, in Venus's place in mission 30, at 150 degrees of phase, from 2.4 times its radius |
+| `screenshots/19-moon.png` | The Moon, in Ganymede's place in mission 83, at 80 degrees of phase, from 2.4 times its radius |
+| `screenshots/20-moon-terminator.png` | The Moon's relief along the terminator, in Ganymede's place in mission 83, at 85 degrees of phase, from 1.45 times its radius |

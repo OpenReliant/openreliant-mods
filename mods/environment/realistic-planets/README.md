@@ -7,11 +7,11 @@ comes from, so that anyone can check it or make it again. The scripts are in the
 folder.
 
 **Status:** every body the game has is done: Neptune and Triton, Uranus, Saturn and Titan, Jupiter
-and its moons Io, Europa, Ganymede and Callisto, Earth and Venus. The mod adds Mars, which the game
-doesn't have. The mod needs OpenReliant 0.12. Each body is lit by Minnaert's law in full, Saturn and
+and its moons Io, Europa, Ganymede and Callisto, Earth and Venus. The mod adds Mars and the Moon,
+which the game doesn't have. The mod needs OpenReliant 0.12. Each body is lit by Minnaert's law in full, Saturn and
 its ring shade each other, Earth is a planet with its city lights on its night side, every planet and
-Titan has its haze, air or dust and a backlit crescent ([The haze](#the-haze)), and every body turns
-and leans as it really does, sixty times as fast.
+Titan has its haze, air or dust and a backlit crescent ([The haze](#the-haze)), the Moon shows its
+relief along the terminator, and every body turns and leans as it really does, sixty times as fast.
 
 ## The game's planets
 
@@ -121,6 +121,9 @@ What OpenReliant's source and `sltool` show about them:
   are.
 - Mars's sphere has the radius of the game's planets, 1,280,625 units, and a polar radius 0.994 of
   that, 3,376.2 km to 3,396.2 (IAU). It's a single model, as Earth's is.
+- The Moon's sphere has the radius of the game's moons, 288,141 units, which against Earth's sphere
+  is the real Moon's size against Earth's: 0.275 of it, to the real 0.273. It's round, and a single
+  model.
 - The textures are named `realistic_planets_<body>`, so the game's own stay for any other model that
   uses them.
 
@@ -128,7 +131,7 @@ What OpenReliant's source and `sltool` show about them:
 
 OpenReliant keeps the planets in a table that a mod's load script can change and add to. The mod's
 load script, `records.luau`, sets how each body turns and leans, makes Earth a planet, and gives
-Mars its entry.
+Mars and the Moon their entries.
 
 - Each body turns with its sidereal day from NASA's planetary fact sheets, sixty times as fast: an
   hour passes in a minute, so Jupiter, the fastest, turns once every ten minutes, and Earth once
@@ -141,7 +144,8 @@ Mars its entry.
   days.
 - Each pole leans from the pole of the planet's orbit by its obliquity: Neptune's by 28.32 degrees,
   Uranus's by 82.23, Saturn's by 26.73, Jupiter's by 3.13, Venus's by 2.64, Earth's by 23.44 and
-  Mars's by 25.19. The
+  Mars's by 25.19. The Moon's leans 6.68 degrees from the pole of its own orbit, and it turns once an
+  orbit, in 27.3 days. The
   game has no orbits, so the mission's frame stands in: a pole leans from the planet's up as the
   mission places it.
 - A moon turns once an orbit, as Io, Europa, Ganymede, Callisto, Titan and Triton do, and leans as
@@ -153,8 +157,9 @@ Mars its entry.
   in four of them.
 - Earth becomes a planet, so the sun alone lights it, as it lights the others, and its night side is
   dark but for its city lights ([City lights](#city-lights)).
-- Mars, the type the mod adds, gets its own entry, by its qualified name. In a folder of another name
-  than `realistic-planets`, the name isn't found, and Mars keeps Venus's entry, its base's
+- Mars and the Moon, the types the mod adds, get their own entries, by their qualified names. In a
+  folder of another name than `realistic-planets`, the names aren't found, and each keeps its base's
+  entry, Venus's or Europa's
   ([OpenReliant#1220](https://github.com/OpenReliant/openreliant/issues/1220)).
 - The band the game draws over the rim of Neptune, Uranus, Jupiter and Venus is left out: each
   planet's limb law, fitted to its measured photometry, already gives the rim its light
@@ -907,6 +912,63 @@ map, and its colour from Mars's measured spectrum, each checked against Hubble's
 - The texture's mean luminance is 0.072, the same share of Mars's true brightness as Jupiter's 0.3 is
   of Jupiter's, from Mallama's geometric albedo in V of 0.170 and Minnaert's law in green.
 
+## The Moon
+
+The Moon isn't in the game either. The mod adds it as a new object type, `realistic-planets:luna`,
+named Luna, based on Europa's (`mod.ini`), with a sphere and a planet entry of its own. As for Mars,
+none of the game's missions place it, and only this mod's own missions can place it for now
+([OpenReliant#1219](https://github.com/OpenReliant/openreliant/issues/1219)).
+
+Its map is LROC's colour mosaic, each pixel's colour taken from three calibrated wavelengths, with
+LOLA's albedo at the poles. It's the only body with a normal map: the mosaic holds the ground's
+albedo without its relief's shading, LOLA's heights give the relief, and the Moon, without air,
+shows its craters and mountains sharply along the terminator.
+
+### Sources considered
+
+| Source | What it is | Licence | Used |
+|---|---|---|---|
+| [LROC's photometrically normalised colour mosaic](https://data.lroc.im-ldi.com/lroc/view_rdr/WAC_HAPKE) (H. Sato and others, 2017) | The radiance factor at 321, 360, 415, 566, 604, 643 and 689 nm from 70 north to 70 south, 76 pixels a degree, each pixel the median of about 140 of the Wide Angle Camera's pictures of it, all normalised to incidence and phase angles of 60 degrees with Hapke's law and the slopes of the ground under each pixel | Public domain (NASA/GSFC/Arizona State University) | Yes, at 415, 566 and 643 nm |
+| [LOLA's maps](https://pds-geosciences.wustl.edu/missions/lro/lola.htm) | The heights at 16 pixels a degree, and the normal albedo at 1064 nm at 10, both from pole to pole | Public domain (NASA/GSFC) | Yes, the heights for the normal map and the albedo for the poles |
+| [NASA SVS's CGI Moon Kit](https://svs.gsfc.nasa.gov/4720) (2019 and 2025) | Colour maps made from the same mosaic, its 643, 566 and 415 nm bands shown as red, green and blue, with the exposure and the white balance set by eye | Public domain, credit NASA's Scientific Visualization Studio | No: its colours are set for looks, as its page says, not taken through the eye's response |
+| The USGS's LROC WAC global mosaic | One band at 100 m a pixel, from pictures taken with the sun low | Public domain | No: it holds the shading of the relief, which the normal map adds |
+| [NASA's Moon Fact Sheet](https://nssdc.gsfc.nasa.gov/planetary/factsheet/moonfact.html) | The Moon's visual geometric albedo, day and lean | Public domain | For the brightness, the turn and the lean |
+
+### The map
+
+- Each texel of the 4096 by 2048 texture is the mean of the mosaic's pixels in it, at each band. The
+  pixels below a quarter of their tile's median lay in shadow in the pictures, mostly near 70
+  degrees, and are left out.
+- Beyond 70 degrees, each band is LOLA's normal albedo at 1064 nm, which reaches the poles, raised to
+  the power and scaled by the factor that fit the mosaic to it on the logarithm between 60 and 69
+  degrees, in each hemisphere. The mosaic follows LOLA's albedo closely there, with a correlation of
+  0.85 to 0.87, to the power 1.43 and 1.52 at 415 nm, north and south, 1.30 and 1.35 at 566, and 1.25
+  and 1.29 at 643. From 67 degrees to the mosaic's edge, the two are blended.
+
+### Colour and brightness
+
+- Each texel's spectrum runs straight through the three bands, and on with the same slope beyond
+  them, as the Moon's spectrum rises almost in a straight line across the visible, and is taken
+  through the CIE 1931 observer, as for the other bodies. The mosaic is calibrated, so its colours
+  are the Moon's own: the maria a little bluer than the highlands, and the whole a warm grey, sRGB
+  (66, 60, 53) at the texture's brightness. Its blue is 0.78 of its green in linear light, as the
+  Moon's colour index B-V of 0.92, against the Sun's 0.65, gives.
+- The texture's mean luminance is 0.047, the same share of the Moon's true brightness as Jupiter's 0.3
+  is of Jupiter's, from NASA's visual geometric albedo of 0.12. At full Moon, its dusty ground is as
+  bright to the edge as in the middle, so its normal albedo is its geometric albedo.
+
+### Relief
+
+- The normal map, `realistic_planets_luna_normal.png`, holds the slope of the ground in each texel,
+  from LOLA's heights averaged over the texel, at their true height: half the texels slope by more
+  than 3.3 degrees, and one in a hundred by more than 19. Toward the poles, where a texel spans less
+  and less of a degree east to west, the slope east is taken over neighbours as far apart as the
+  neighbours north and south.
+- It's 16 bits, so that the maria's gentle slopes light smoothly in a low sun; at 8 bits, they would
+  show in steps.
+- It needs the MATERIALS setting under VIDEO, which is on by default. Without it, the Moon is lit as
+  a smooth ball.
+
 ## The limb
 
 A planet's haze changes how its sunlit limb looks against a plain ball's, mostly brightening it.
@@ -963,6 +1025,12 @@ as before.
   few pixels. Divided by HRSC's reflectance there, the markings drop out and the law is left. The
   exponents are 0.473 at 410 nm, 0.549 at 502, 0.633 at 588, 0.628 at 631 and 0.703 at 673: 0.630
   for red, 0.591 for green and 0.511 for blue. Mars's dust brightens the limb, most in blue.
+- The Moon has a law of its own, `luna.glsl`: McEwen's lunar-Lambert law, which mixes Lommel and
+  Seeliger's law, 2 mu0 / (mu0 + mu), with Lambert's, mu0, by a share that falls with the phase
+  angle: 1 - 0.019 phase + 0.000242 phase^2 - 0.00000146 phase^3, in degrees, held at 0 past about 103
+  degrees, where it would turn negative. At full Moon the disk is as bright at its edge as in its
+  middle, and its relief fades away, as the real full Moon's does; toward the half Moon it darkens
+  toward the terminator as a matt ball does, and the normal map's craters and mountains show.
 - Triton's come from its frames in the same way: 0.747 at 416 nm, 0.752 at 479, 0.741 at 566 and
   0.741 at 591, so 0.741 for red, 0.744 for green and 0.750 for blue. Its frost brightens the limb
   about as much in each colour.
@@ -1050,7 +1118,8 @@ The scripts and the steps to run them are in the collection's
 [`sources/realistic-planets`](https://github.com/OpenReliant/openreliant-mods/tree/main/sources/realistic-planets)
 folder. A build downloads what each texture is made from, about 80 MB for Neptune, 93 MB for
 Jupiter, 3 MB for Uranus, 190 MB for Saturn, 270 MB for Venus, 60 MB for Titan, 1.4 GB for Jupiter's
-moons and Triton, 740 MB for Earth and 790 MB for Mars, and makes the same textures again.
+moons and Triton, 740 MB for Earth, 790 MB for Mars and 3.6 GB for the Moon, and makes the same textures
+again.
 
 ## Credits and licences
 
@@ -1124,6 +1193,19 @@ moons and Triton, 740 MB for Earth and 790 MB for Mars, and makes the same textu
   of Geophysical Research 106 (2001).
 - Hubble's frames of Mars: NASA/ESA, programme 10065 (PI: J. F. Bell), from MAST, with the geometry of
   each frame from NASA/JPL's Horizons system. Only measurements made from the frames are in the mod.
+- LROC's photometrically normalised colour mosaic of the Moon: NASA/GSFC/Arizona State University, in
+  the public domain, from the LROC team's PDS archive (LRO-L-LROC-5-RDR-V1.0, WAC_HAPKE); H. Sato,
+  M. S. Robinson, S. J. Lawrence, B. W. Denevi, B. Hapke, B. L. Jolliff and H. Hiesinger, "Lunar mare
+  TiO2 abundances estimated from UV/Vis reflectance", Icarus 296 (2017); H. Sato, M. S. Robinson,
+  B. Hapke, B. W. Denevi and A. K. Boyd, "Resolved Hapke parameter maps of the Moon", Journal of
+  Geophysical Research: Planets 119 (2014).
+- LOLA's heights and albedo of the Moon: NASA/GSFC, in the public domain, from the PDS Geosciences
+  Node (LRO-L-LOLA-4-GDR-V1.0, `ldem_16` and `ldam_10_float`); D. E. Smith and others, "Initial
+  observations from the Lunar Orbiter Laser Altimeter (LOLA)", Geophysical Research Letters 37
+  (2010); P. G. Lucey and others, "The global albedo of the Moon at 1064 nm from LOLA", Journal of
+  Geophysical Research: Planets 119 (2014).
+- The Moon's law of light: A. S. McEwen, "A precise lunar photometric function", Lunar and Planetary
+  Science XXVII (1996), as USGS's ISIS implements it (`LunarLambertMcEwen`).
 - Mars's dust: H. Chen-Chen, S. Pérez-Hoyos and A. Sánchez-Lavega, "Characterisation of Martian dust
   aerosol phase function from sky radiance measurements by MSL engineering cameras", Icarus 330
   (2019), and "Dust particle size and optical depth on Mars retrieved by the MSL Navigation
@@ -1141,8 +1223,9 @@ moons and Triton, 740 MB for Earth and 790 MB for Mars, and makes the same textu
   Venus from SPICAV IR data", Icarus (2018); J. E. Hansen and J. W. Hovenier, "Interpretation of the
   polarization of Venus", Journal of the Atmospheric Sciences 31 (1974); Mie theory by S. Prahl's
   miepython.
-- The geometric albedos of the Galilean moons, of Triton and of Earth, and Mars's day, lean and air:
-  NASA's Jovian Satellite, Neptunian Satellite, Earth and Mars Fact Sheets.
+- The geometric albedos of the Galilean moons, of Triton, of Earth and of the Moon, Mars's and the
+  Moon's day and lean, and Mars's air: NASA's Jovian Satellite, Neptunian Satellite, Earth, Moon and
+  Mars Fact Sheets.
 - Venus's spectrum considered: A. Payne, G. L. Villanueva and others, "A comprehensive spectroscopic
   reference of the solar system and its application to exoplanet direct imaging", The Planetary
   Science Journal (2025).
@@ -1156,7 +1239,9 @@ moons and Triton, 740 MB for Earth and 790 MB for Mars, and makes the same textu
   surface, for Jupiter's moons NASA/JPL for the Voyager data and the USGS Astrogeology Science
   Center for its maps, for Triton NASA/JPL for the Voyager data and NASA/JPL and the Lunar and
   Planetary Institute for its map, for Earth NASA Goddard Space Flight Center for the Blue
-  Marble, NASA Earth Observatory for the Black Marble and NOAA for the GOES data, and for Mars
-  ESA/DLR/FU Berlin for the HRSC mosaics and NASA/JPL/Arizona State University for the TES map.
+  Marble, NASA Earth Observatory for the Black Marble and NOAA for the GOES data, for Mars
+  ESA/DLR/FU Berlin for the HRSC mosaics and NASA/JPL/Arizona State University for the TES map, and
+  for the Moon NASA/GSFC/Arizona State University for the LROC mosaic and NASA/GSFC for the LOLA
+  maps.
 - The spheres, the manifest and the scripts are OpenReliant's, under the Mozilla Public License
   2.0.

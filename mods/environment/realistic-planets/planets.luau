@@ -1,7 +1,8 @@
 -- Realistic Planets: lights each body to match its measured photometry with Minnaert's law
 -- (minnaert.glsl), draws the haze, air or dust of the planets and Titan (haze.glsl, included by
--- each body's shader), shades Saturn with its ring, and shows Earth's city lights at night. This
--- is a player script, so it runs for the whole game. The functions need PER-PIXEL LIGHTING.
+-- each body's shader), shades Saturn with its ring, shows Earth's city lights at night, and lights
+-- the Moon by its own law, with its relief (luna.glsl). This is a player script, so it runs for the
+-- whole game. The functions need PER-PIXEL LIGHTING.
 -- records.luau sets how the bodies turn and lean, and which rings their haze is drawn on.
 
 local shaders = require("openreliant.shaders")
@@ -57,6 +58,10 @@ register("earth", "earth.glsl", { 0.871, 0.815, 0.750 }, PLANET_LEAST_COSINE, tr
 -- Mars: Hubble's frames of August 2003 (0.473 at 410 nm, 0.549 at 502, 0.633 at 588, 0.628 at 631
 -- and 0.703 at 673), at 608, 545 and 455 nm.
 register("mars", "mars.glsl", { 0.630, 0.591, 0.511 }, MOON_LEAST_COSINE, true)
+
+-- The Moon: McEwen's lunar-Lambert law (luna.glsl), which needs no numbers, with its relief from
+-- the texture's normal map.
+shaders.register_surface({ name = "luna", shader = "luna.glsl", textures = { "realistic_planets_luna" } })
 
 -- Titan: Cassini's frames of 2010 (0.876 at 463 nm, 0.897 at 568 and 0.855 at 647), at 606, 544
 -- and 455 nm.
