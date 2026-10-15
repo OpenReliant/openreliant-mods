@@ -162,6 +162,15 @@ Written for the mod, for the ratings the mission can reach.
   generator 6 in the two triggers and five commands that name it, and aims the one torpedo of the
   Cougars' first run that the old numbering sent at the generator, gone by then, at the hull. The
   old model's other numbers aren't known, so the other torpedoes keep theirs.
+- **The fighter count:** the generator becomes the objective once the script has counted 11 of the
+  14 fighters of the squad "(AI)All badfighters after 2nd ast launch" destroyed. The part that
+  counts them ends with `InterruptTriggerCode`, which makes a trigger's code wait for its trigger to
+  fire again. The part runs on a thread that no trigger started, so it waits forever, and each kill
+  keeps a thread. The script has 32 threads, and the mission's triggers that wait for their next
+  firing and its radio lines use others, so the threads can run out before the count reaches 11:
+  then further kills go uncounted, and the mission can get stuck. The original game runs the
+  script the same way. The mod's file has `MultiPlayerSync` in its place, which outside a network
+  game yields once and lets the part end.
 
 ## Open points for the mod
 

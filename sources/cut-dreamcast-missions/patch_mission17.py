@@ -1,5 +1,6 @@
 """Renumbers the Gegarin's components in mission 17, so that its script names the PC's Pukov's
-parts, and writes the mission the mod ships.
+parts, ends the part that counts the destroyed fighters properly, and writes the mission the mod
+ships.
 
     python3 patch_mission17.py <the Dreamcast's mission17.dte> <out.dte>
 
@@ -14,6 +15,15 @@ five commands that make it invulnerable, arm its ShotAt trigger and make it the 
 One torpedo of the Cougars' first run is aimed at the old model's component 6, which on the PC is
 the generator, destroyed by then, so it's aimed at 4, the hull, instead. The old model's other
 numbers aren't known, so the torpedoes aimed at 0, 2 and 5 keep them.
+
+The part that counts the destroyed fighters ends with InterruptTriggerCode, which makes a trigger's
+code wait until its trigger fires again. The part runs on a thread of its own that no trigger
+started, so it waits forever and keeps its thread. The script has 32 threads, which the mission's
+other waiting code uses too. Once they run out, no new thread starts: kills go uncounted, the count
+can stop short of 11, and the generator's trigger can't run either. The original game runs the
+script the same way. Here MultiPlayerSync takes the
+command's place: outside a network game the thread yields once, then goes on to its return, and its
+thread ends.
 
 Each byte is checked before it's changed, so the script refuses any other file.
 """
@@ -34,6 +44,11 @@ PUKOV = 0x07
 PUSHES_OF_GENERATOR = (3226, 3734, 4380, 4933, 5038)
 TORPEDO_AT_GENERATOR = 2528
 OLD_GENERATOR, NEW_GENERATOR = 4, 6
+# The fighter count's InterruptTriggerCode, by its place in the script, and the MultiPlayerSync
+# that replaces it.
+COUNT_WAIT = 5043
+INTERRUPT_TRIGGER_CODE = bytes([0x21, 0x17])
+MULTIPLAYER_SYNC = bytes([0x21, 0x2D])
 
 
 def change(image, at, old, new):
@@ -52,6 +67,8 @@ def main():
         if image[SCRIPT + at:SCRIPT + at + 2] != bytes([PUSH_COMPONENT, PUKOV]):
             sys.exit(f"the script at {at} isn't a push of the Pukov's component: this isn't the Dreamcast's mission17.dte")
         change(image, SCRIPT + at + 2, old, new)
+    for offset, (old, new) in enumerate(zip(INTERRUPT_TRIGGER_CODE, MULTIPLAYER_SYNC)):
+        change(image, SCRIPT + COUNT_WAIT + offset, old, new)
     open(sys.argv[2], 'wb').write(image)
 
 

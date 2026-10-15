@@ -10,7 +10,7 @@ out.
 ## The missions
 
 `mission12.dte`, `mission13.dte`, `mission17.dte` and `mission22.dte` are the Dreamcast disc's, as
-they are but for 8 bytes of mission 17. The disc's `RESOURCE.HOG` uses the PC's archive format, so
+they are but for 9 bytes of mission 17. The disc's `RESOURCE.HOG` uses the PC's archive format, so
 `sltool` takes them out:
 
 ```bash
@@ -22,8 +22,16 @@ generator 4. The PC's Pukov numbers its hull 4 and its shield generator 6, so th
 the hull to go, and destroying the generator moved nothing on
 ([OpenReliant#1197](https://github.com/OpenReliant/openreliant/issues/1197)). `patch_mission17.py`
 renumbers the generator in the script's two triggers and five commands that name it, and aims the
-one torpedo that the old numbering sent at the generator, gone by then, at the hull. It checks each
-byte before it changes it:
+one torpedo that the old numbering sent at the generator, gone by then, at the hull.
+
+The part that counts the destroyed fighters ends with `InterruptTriggerCode`, which makes a
+trigger's code wait for its trigger to fire again. The part runs on a thread that no trigger
+started, so it waits forever, and each kill keeps a thread. The script has 32 threads, so the count
+can stop short of 11 once they run out, and then the generator's trigger can't run either. The
+original game runs the script the same way. `patch_mission17.py` puts `MultiPlayerSync` in its place,
+which outside a network game yields once and lets the part end.
+
+The script checks each byte before it changes it:
 
 ```bash
 python3 patch_mission17.py dreamcast/mission17.dte mission17.dte
