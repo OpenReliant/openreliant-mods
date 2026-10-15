@@ -153,6 +153,25 @@ Written for the mod, for the ratings the mission can reach.
   > too. Remember that next time.
 - **Total failure** (the pilot's career ends): no debriefing.
 
+## What the mod changes
+
+- **The Gegarin's shield generator:** the file was made for an older model of the Pukov, which
+  numbered its shield generator 4. The PC's Pukov numbers its hull 4 and its shield generator 6, as
+  mission 27 does, so the script waited for the hull to go, made the hull invulnerable, and set it
+  as the player's target, and destroying the generator moved nothing on. The mod's file names the
+  generator 6 in the two triggers and five commands that name it, and aims the one torpedo of the
+  Cougars' first run that the old numbering sent at the generator, gone by then, at the hull. The
+  old model's other numbers aren't known, so the other torpedoes keep theirs.
+- **The fighter count:** the generator becomes the objective once the script has counted 11 of the
+  14 fighters of the squad "(AI)All badfighters after 2nd ast launch" destroyed. The part that
+  counts them ends with `InterruptTriggerCode`, which makes a trigger's code wait for its trigger to
+  fire again. The part runs on a thread that no trigger started, so it waits forever, and each kill
+  keeps a thread. The script has 32 threads, and the mission's triggers that wait for their next
+  firing and its radio lines use others, so the threads can run out before the count reaches 11:
+  then further kills go uncounted, and the mission can get stuck. The original game runs the
+  script the same way. The mod's file has `MultiPlayerSync` in its place, which outside a network
+  game yields once and lets the part end.
+
 ## Open points for the mod
 
 - **Faces:** the mission's comms give the wrong faces. The mod sets the speaking ships' pilots as
