@@ -153,6 +153,16 @@ Written for the mod, for the ratings the mission can reach.
   > too. Remember that next time.
 - **Total failure** (the pilot's career ends): no debriefing.
 
+## What the mod changes
+
+- **The Gegarin's shield generator:** the file was made for an older model of the Pukov, which
+  numbered its shield generator 4. The PC's Pukov numbers its hull 4 and its shield generator 6, as
+  mission 27 does, so the script waited for the hull to go, made the hull invulnerable, and set it
+  as the player's target, and destroying the generator moved nothing on. The mod's file names the
+  generator 6 in the two triggers and five commands that name it, and aims the one torpedo of the
+  Cougars' first run that the old numbering sent at the generator, gone by then, at the hull. The
+  old model's other numbers aren't known, so the other torpedoes keep theirs.
+
 ## Open points for the mod
 
 - **Faces:** the mission's comms give the wrong faces. The mod sets the speaking ships' pilots as

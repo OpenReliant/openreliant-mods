@@ -10,10 +10,23 @@ out.
 ## The missions
 
 `mission12.dte`, `mission13.dte`, `mission17.dte` and `mission22.dte` are the Dreamcast disc's, as
-they are. The disc's `RESOURCE.HOG` uses the PC's archive format, so `sltool` takes them out:
+they are but for 8 bytes of mission 17. The disc's `RESOURCE.HOG` uses the PC's archive format, so
+`sltool` takes them out:
 
 ```bash
 sltool hog extract RESOURCE.HOG dreamcast
+```
+
+Mission 17 was made for an older model of the Pukov, the Gegarin's class, which numbered its shield
+generator 4. The PC's Pukov numbers its hull 4 and its shield generator 6, so the script waited for
+the hull to go, and destroying the generator moved nothing on
+([OpenReliant#1197](https://github.com/OpenReliant/openreliant/issues/1197)). `patch_mission17.py`
+renumbers the generator in the script's two triggers and five commands that name it, and aims the
+one torpedo that the old numbering sent at the generator, gone by then, at the hull. It checks each
+byte before it changes it:
+
+```bash
+python3 patch_mission17.py dreamcast/mission17.dte mission17.dte
 ```
 
 ## The scripts
