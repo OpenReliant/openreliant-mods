@@ -7,11 +7,11 @@ comes from, so that anyone can check it or make it again. The scripts are in the
 folder.
 
 **Status:** every body the game has is done: Neptune and Triton, Uranus, Saturn and Titan, Jupiter
-and its moons Io, Europa, Ganymede and Callisto, Earth and Venus. The mod needs OpenReliant 0.12.
-Each body is lit by Minnaert's law in full, Saturn and its ring shade each other, Earth is a planet
-with its city lights on its night side, every planet and Titan has its haze or air and a backlit
-crescent as bright as the spacecraft saw it ([The haze](#the-haze)), and every body turns and leans as
-it really does, sixty times as fast.
+and its moons Io, Europa, Ganymede and Callisto, Earth and Venus. The mod adds Mars, which the game
+doesn't have. The mod needs OpenReliant 0.12. Each body is lit by Minnaert's law in full, Saturn and
+its ring shade each other, Earth is a planet with its city lights on its night side, every planet and
+Titan has its haze, air or dust and a backlit crescent ([The haze](#the-haze)), and every body turns
+and leans as it really does, sixty times as fast.
 
 ## The game's planets
 
@@ -119,25 +119,29 @@ What OpenReliant's source and `sltool` show about them:
   are 1,280,625 units, as large as Neptune's. Europa's far model is a little larger than its
   detailed one, 331,938 units, and Ganymede's is 50 times smaller, 5,763 units, both as the game's
   are.
+- Mars's sphere has the radius of the game's planets, 1,280,625 units, and a polar radius 0.994 of
+  that, 3,376.2 km to 3,396.2 (IAU). It's a single model, as Earth's is.
 - The textures are named `realistic_planets_<body>`, so the game's own stay for any other model that
   uses them.
 
 ## Turning and leaning
 
 OpenReliant keeps the planets in a table that a mod's load script can change and add to. The mod's
-load script, `records.luau`, sets how each body turns and leans, and makes Earth a planet.
+load script, `records.luau`, sets how each body turns and leans, makes Earth a planet, and gives
+Mars its entry.
 
 - Each body turns with its sidereal day from NASA's planetary fact sheets, sixty times as fast: an
   hour passes in a minute, so Jupiter, the fastest, turns once every ten minutes, and Earth once
   every 24. `TIME_SCALE` at the top of the script sets the factor.
 - North is the pole the International Astronomical Union names, on the north side of the solar
-  system, at the top of each texture. Neptune, Saturn, Jupiter and Earth turn eastward, Uranus and
-  Venus westward.
+  system, at the top of each texture. Neptune, Saturn, Jupiter, Earth and Mars turn eastward, Uranus
+  and Venus westward.
 - Venus's map shows its cloud tops, which turn westward once in about five days, as Akatsuki's maps
   show ([Venus](#venus)), so Venus turns with them rather than with its ground, which takes 243
   days.
 - Each pole leans from the pole of the planet's orbit by its obliquity: Neptune's by 28.32 degrees,
-  Uranus's by 82.23, Saturn's by 26.73, Jupiter's by 3.13, Venus's by 2.64 and Earth's by 23.44. The
+  Uranus's by 82.23, Saturn's by 26.73, Jupiter's by 3.13, Venus's by 2.64, Earth's by 23.44 and
+  Mars's by 25.19. The
   game has no orbits, so the mission's frame stands in: a pole leans from the planet's up as the
   mission places it.
 - A moon turns once an orbit, as Io, Europa, Ganymede, Callisto, Titan and Triton do, and leans as
@@ -149,6 +153,9 @@ load script, `records.luau`, sets how each body turns and leans, and makes Earth
   in four of them.
 - Earth becomes a planet, so the sun alone lights it, as it lights the others, and its night side is
   dark but for its city lights ([City lights](#city-lights)).
+- Mars, the type the mod adds, gets its own entry, by its qualified name. In a folder of another name
+  than `realistic-planets`, the name isn't found, and Mars keeps Venus's entry, its base's
+  ([OpenReliant#1220](https://github.com/OpenReliant/openreliant/issues/1220)).
 - The band the game draws over the rim of Neptune, Uranus, Jupiter and Venus is left out: each
   planet's limb law, fitted to its measured photometry, already gives the rim its light
   ([The limb](#the-limb)).
@@ -835,6 +842,71 @@ planet, and its night side shows its city lights, from NASA's Black Marble
   dim, by up to 85%, as the clouds would hide them.
 - An emissive map needs the MATERIALS setting under VIDEO, which is on by default.
 
+## Mars
+
+Mars isn't in the game. The mod adds it as a new object type, `realistic-planets:mars`, based on
+Venus's (`mod.ini`), with a sphere and a planet entry of its own. None of the game's missions place
+it, and as a type a mod adds, only this mod's own missions can place it for now
+([OpenReliant#1219](https://github.com/OpenReliant/openreliant/issues/1219)).
+
+Its map takes its detail from Mars Express's HRSC mosaics, its broad markings from MGS's TES albedo
+map, and its colour from Mars's measured spectrum, each checked against Hubble's frames of Mars from
+2003.
+
+### Sources considered
+
+| Source | What it is | Licence | Used |
+|---|---|---|---|
+| [HRSC's global colour mosaics](https://hrscteam.dlr.de/public/data/globalcolor.php) (G. G. Michael and others, 2025) | Mars Express's pictures from high above Mars in its blue, green, red, near-infrared and panchromatic filters, each mosaicked as reflectance at 2 km a pixel, scaled to one well-calibrated observation | Credit ESA/DLR/FU Berlin | Yes, the blue, green and red mosaics, at 440, 530 and 750 nm, for the detail and the south polar cap |
+| [TES's albedo map](http://tes.mars.asu.edu/products/) (P. R. Christensen and others, 2001) | MGS's bolometric Lambert albedo, 8 pixels a degree | Public domain (NASA/JPL/Arizona State University) | Yes, for the broad markings and the north polar cap |
+| Hubble's WFPC2 frames of programme 10065, "Mars at Closest Approach", through [MAST](https://archive.stsci.edu/) | Calibrated frames of Mars on 26 and 27 August 2003, at 410, 502, 588, 631 and 673 nm, about 12 km a pixel | Public (NASA/ESA) | Yes, nine frames, for the limb, the markings' contrast and the polar cap's colour |
+| A. Mallama, B. Krobusek and H. Pavlov (2017) | Mars's geometric albedo in the Johnson-Cousins and Sloan filters | Published values | For the colour |
+| [The USGS's Viking colour mosaic](https://astrogeology.usgs.gov/search/map/mars_viking_global_color_mosaic_925m) | Viking's red and violet pictures at 925 m a pixel, with a green made from their mean | Public domain | No: its green is made up |
+| [Tianwen-1's colour map](https://dc.g-vo.org/rr/q/lp/custom/CDS/P/Mars/Tianwen1-MoRIC) (J. Liu and others, 2024) | A true-colour map at 76 m a pixel | No licence stated | No: it states no licence, and its download needs an account |
+| The Emirates Mars Mission's EXI | Calibrated pictures of the whole disk at 437, 546 and 635 nm | | No: its data needs an account |
+| HRSC's panchromatic mosaic | The same as HRSC's others, through a broad filter round 675 nm | Credit ESA/DLR/FU Berlin | No: its scale doesn't match its colour filters' |
+
+### The map
+
+- The texture is made on HRSC's grid, 10,669 by 5,334, north at the top and 0 degrees east in the
+  middle column, and scaled to 4096 by 2048 in linear light.
+- HRSC's mosaics hold Mars's detail, but not its broad markings: each filter's mosaic is held to the
+  planet's mean brightness across the gaps in its coverage, which leaves it "partially detrended"
+  against TES's albedo, as its team notes. Across the globe its logarithm varies a third as much as
+  TES's, 0.12 against 0.29 in red, and in blue its broad markings run against TES's.
+- Hubble's frames decide between them. With the limb's law taken out and blurred over a few pixels,
+  their brightness follows the TES albedo with a correlation of 0.92 to 0.95 in red and orange, and
+  HRSC's red mosaic with 0.4 to 0.6.
+- So the ground keeps HRSC's detail finer than 1.5 degrees, about 90 km, and takes its broad markings
+  from the TES map: at each of Hubble's wavelengths, its brightness follows the TES albedo raised to
+  the power Hubble measured there, 0.09 at 410 nm, 0.22 at 502, 0.42 at 588, 0.49 at 631 and 0.54 at
+  673. Mars's markings are faint in violet and strong in red.
+- The TES map has no data within about 2.5 degrees of either pole. There, each row takes the mean of
+  the nearest row with all its data.
+
+### The polar caps
+
+- The ground's law would tint the ice red, so the caps are drawn apart. In the south, HRSC's
+  mosaics show the residual cap clearly, and a texel is ice where their blue passes 0.6 of their red,
+  wholly so above 1.0. In the north they barely show the cap, as their coverage there has gaps, so a
+  texel is ice where the TES albedo north of 70 degrees passes 0.26, wholly so above 0.31.
+- The ice is as bright against the ground as Hubble saw the south cap's core in 2003, where HRSC's
+  blue passes 1.15 of its red: 2.8 times the ground at 410 nm, 2.1 at 502, 1.7 at 588, 1.6 at 631
+  and 1.55 at 673, a warm white, with HRSC's detail. Hubble saw the cap at a slant through Mars's
+  dust, as the game's views see it. The north cap takes the south cap's colour, as Hubble saw only
+  the south.
+
+### Colour and brightness
+
+- Each texel's spectrum is Mars's geometric albedo, Mallama's albedos in the Johnson-Cousins and
+  Sloan filters joined by a monotone curve, bent through the texel's brightness at Hubble's five
+  wavelengths over the globe's mean, and taken through the CIE 1931 observer, as for the other
+  bodies. HRSC's mosaics agree with the spectrum: their blue's mean is 0.30 of their red's, as the
+  spectrum's is, and their green's 0.53, against the spectrum's 0.52.
+- Mars's mean colour is a light butterscotch, sRGB (142, 114, 84) at its geometric albedo.
+- The texture's mean luminance is 0.072, the same share of Mars's true brightness as Jupiter's 0.3 is
+  of Jupiter's, from Mallama's geometric albedo in V of 0.170 and Minnaert's law in green.
+
 ## The limb
 
 A planet's haze changes how its sunlit limb looks against a plain ball's, mostly brightening it.
@@ -885,14 +957,20 @@ as before.
   and 0.539, and Callisto's 0.578, 0.563 and 0.532. The moons have no air, but their ground scatters
   light as the Moon's dust does, which makes the full Moon look almost evenly bright to its edge, so
   their limbs brighten, Ganymede's and Callisto's the most and a little more in blue.
+- Mars's come from Hubble's frames of 2003, at 5 degrees of phase, from two visits that face
+  opposite sides of Mars. Each pixel of the disk is mapped to Mars's latitude and longitude, with
+  JPL Horizons's geometry at the frame's own time, and its pointing fitted to HRSC's markings to a
+  few pixels. Divided by HRSC's reflectance there, the markings drop out and the law is left. The
+  exponents are 0.473 at 410 nm, 0.549 at 502, 0.633 at 588, 0.628 at 631 and 0.703 at 673: 0.630
+  for red, 0.591 for green and 0.511 for blue. Mars's dust brightens the limb, most in blue.
 - Triton's come from its frames in the same way: 0.747 at 416 nm, 0.752 at 479, 0.741 at 566 and
   0.741 at 591, so 0.741 for red, 0.744 for green and 0.750 for blue. Its frost brightens the limb
   about as much in each colour.
-- The planets' and Titan's laws were fitted where mu is at least 0.25, and the moons' where it's at
-  least 0.2. Nearer the limb, the factor stays as it is there: for Neptune and Uranus at most about
+- The planets' and Titan's laws were fitted where mu is at least 0.25, and Mars's and the moons'
+  where it's at least 0.2. Nearer the limb, the factor stays as it is there: for Neptune and Uranus at most about
   1.5 times brighter in red, for Jupiter 1.14 in blue, for Saturn 1.89 in blue, for Venus 0.90 in
   green, for Earth 1.41 in blue, for Titan 1.19 in red and blue, for Jupiter's moons from 1.63 for Io
-  in blue to 2.12 for Callisto in blue, and for Triton 1.52 in red. The middle of the disk is
+  in blue to 2.12 for Callisto in blue, for Triton 1.52 in red, and for Mars 2.20 in blue. The middle of the disk is
   unchanged.
 - With k below 1, mu0^k falls off more slowly than the sun's cosine as the sun sinks, so the
   terminator is soft, as a hazy planet's is, and it stands where the sun sets.
@@ -902,7 +980,7 @@ as before.
 
 ## The haze
 
-Every planet and Titan has a haze, or for Earth its air, drawn by one model, `haze.glsl`, which
+Every planet and Titan has a haze, or for Earth its air and for Mars its dust, drawn by one model, `haze.glsl`, which
 each body's shader includes with its own numbers. Each number is physical, so it can be tuned by hand,
 and each comes from spacecraft frames or published measurements:
 
@@ -941,6 +1019,7 @@ in the colour of the texture beneath it, so the crescent keeps the planet's colo
 | Venus | 0.32, 0.21, 0.16 | 3.3 | 1 | two forward lobes, one for each size of droplet, with a little of Rayleigh's | SPICAV IR's occultations: sulphuric acid droplets of 0.12 and 0.84 micrometres, about 500 and 1 per cubic centimetre at 75 km, and the scale height (Luginin and others, 2016); their refractive index (Hansen and Hovenier, 1974); the lobes from Mie theory |
 | Titan | 2.55, 0.72, 0.37 | 24, 27, 30 | 1, 0.85, 0.92 | two forward lobes | Cassini's frames from 28 to 164 degrees of phase, in its blue, green and red filters, with a detached layer 288 km above the sphere, about 450 km above the ground (West and others, 2011) |
 | Earth | 0.219, 0.107, 0.069 | 8 | 1 | Rayleigh's alone | the air's Rayleigh scattering at the channels' wavelengths (Bucholtz, 1995); the texture holds the haze of dust and droplets low down |
+| Mars | 0.48, 0.49, 0.50 | 11.1 | 0.81, 0.90, 0.96 | a forward lobe, 0.889, taking 0.743 of the light, and a nearly even one, 0.094 | dust about 1.5 micrometres across: the lobes from MSL's sky brightness by angle at 650 nm (Chen-Chen and others, 2019), the albedo from Wolff and others (2009) as Vincendon and others (2015) give it, the optical depth a usual one outside the dust storms, between the 0.4 and 0.75 MSL measured at Gale (Chen-Chen and others, 2019), and the air's scale height (NASA's Mars Fact Sheet) |
 
 Each body's cloud tops' forward light is set to one measured crescent or phase curve:
 
@@ -953,6 +1032,7 @@ Each body's cloud tops' forward light is set to one measured crescent or phase c
 | Venus | 0.45 | 0.6 | Venus's brightness by phase angle (Mallama and others, 2017), within about a tenth from 90 to 160 degrees |
 | Titan | 0.6 | 0.8 | Cassini's crescent at 141 degrees: about 1.3 times the law's light |
 | Earth | 0 | | Its clouds and ground scatter about as evenly as the texture holds them |
+| Mars | 0 | | Mars has no cloud tops: its dust's forward light is all in the haze. Unlike the others', Mars's haze isn't set to a measured crescent; its numbers are the dust's measured properties alone |
 
 The sharper lobe, 0.8, leaves a planet as it was at moderate phase angles and brightens it as the sun
 goes behind it, as Neptune's crescents at 133 and 160 degrees show.
@@ -961,7 +1041,8 @@ On the giant planets the haze is thin: tens of km on bodies tens of thousands of
 disk it shows as a fine line along the limb, brightest with the sun behind the planet, as in the
 spacecraft's pictures. Titan's haze reaches a fifth of its radius, and is blue at the top, where its
 smallest particles scatter blue light the most, and orange below. Earth's air shows as a blue rim,
-and as a ring of light round its night side with the sun behind it.
+and as a ring of light round its night side with the sun behind it. Mars's dust shows as a pale band
+along its lit limb, and as a thin pale crescent with the sun behind it.
 
 ## Making it again
 
@@ -969,7 +1050,7 @@ The scripts and the steps to run them are in the collection's
 [`sources/realistic-planets`](https://github.com/OpenReliant/openreliant-mods/tree/main/sources/realistic-planets)
 folder. A build downloads what each texture is made from, about 80 MB for Neptune, 93 MB for
 Jupiter, 3 MB for Uranus, 190 MB for Saturn, 270 MB for Venus, 60 MB for Titan, 1.4 GB for Jupiter's
-moons and Triton, and 740 MB for Earth, and makes the same textures again.
+moons and Triton, 740 MB for Earth and 790 MB for Mars, and makes the same textures again.
 
 ## Credits and licences
 
@@ -1030,9 +1111,26 @@ moons and Triton, and 740 MB for Earth, and makes the same textures again.
 - Venus Express's camera, VMC: credit ESA, W. Markiewicz, from ESA's Planetary Science Archive
   (VEX-V-VMC-3-RDR-V3.0), CC BY-NC 3.0 IGO. Only the limb's exponents measured from its pictures
   are in the mod.
-- Venus's albedos and phase curves: A. Mallama, B. Krobusek and H. Pavlov, "Comprehensive wide-band
-  magnitudes and albedos for the planets, with applications to exo-planets and Planet Nine", Icarus
-  282 (2017).
+- Venus's and Mars's albedos and Venus's phase curves: A. Mallama, B. Krobusek and H. Pavlov,
+  "Comprehensive wide-band magnitudes and albedos for the planets, with applications to exo-planets
+  and Planet Nine", Icarus 282 (2017).
+- HRSC's global colour mosaics of Mars: credit ESA/DLR/FU Berlin; G. G. Michael and others, "A global
+  colour mosaic of Mars from Mars Express HRSC high altitude observations", Icarus 425, 116350
+  (2025), [doi:10.1016/j.icarus.2024.116350](https://doi.org/10.1016/j.icarus.2024.116350), from the
+  HRSC team's public data at the Freie Universität Berlin.
+- TES's albedo map of Mars: NASA/JPL/Arizona State University, in the public domain, from the TES
+  node at Arizona State University; P. R. Christensen and others, "Mars Global Surveyor Thermal
+  Emission Spectrometer experiment: investigation description and surface science results", Journal
+  of Geophysical Research 106 (2001).
+- Hubble's frames of Mars: NASA/ESA, programme 10065 (PI: J. F. Bell), from MAST, with the geometry of
+  each frame from NASA/JPL's Horizons system. Only measurements made from the frames are in the mod.
+- Mars's dust: H. Chen-Chen, S. Pérez-Hoyos and A. Sánchez-Lavega, "Characterisation of Martian dust
+  aerosol phase function from sky radiance measurements by MSL engineering cameras", Icarus 330
+  (2019), and "Dust particle size and optical depth on Mars retrieved by the MSL Navigation
+  Cameras", Icarus 319 (2019); M. J. Wolff and others, "Wavelength dependence of dust aerosol single
+  scattering albedo as observed by the Compact Reconnaissance Imaging Spectrometer", Journal of
+  Geophysical Research 114 (2009), as M. Vincendon and others give it in "Mars Express measurements
+  of surface albedo changes over 2004 - 2010", Icarus 251 (2015).
 - Jupiter's phase curve: L. C. Mayorga and others, "Jupiter's phase variations from Cassini: a
   testbed for future direct-imaging missions", The Astronomical Journal 152, 209 (2016).
 - Jupiter's haze: X. Zhang, R. A. West, D. Banfield and Y. L. Yung, "Stratospheric aerosols on
@@ -1043,8 +1141,8 @@ moons and Triton, and 740 MB for Earth, and makes the same textures again.
   Venus from SPICAV IR data", Icarus (2018); J. E. Hansen and J. W. Hovenier, "Interpretation of the
   polarization of Venus", Journal of the Atmospheric Sciences 31 (1974); Mie theory by S. Prahl's
   miepython.
-- The geometric albedos of the Galilean moons, of Triton and of Earth: NASA's Jovian Satellite,
-  Neptunian Satellite and Earth Fact Sheets.
+- The geometric albedos of the Galilean moons, of Triton and of Earth, and Mars's day, lean and air:
+  NASA's Jovian Satellite, Neptunian Satellite, Earth and Mars Fact Sheets.
 - Venus's spectrum considered: A. Payne, G. L. Villanueva and others, "A comprehensive spectroscopic
   reference of the solar system and its application to exoplanet direct imaging", The Planetary
   Science Journal (2025).
@@ -1057,7 +1155,8 @@ moons and Triton, and 740 MB for Earth, and makes the same textures again.
   Institute for the Cassini data and NASA/JPL-Caltech/University of Arizona for the map of its
   surface, for Jupiter's moons NASA/JPL for the Voyager data and the USGS Astrogeology Science
   Center for its maps, for Triton NASA/JPL for the Voyager data and NASA/JPL and the Lunar and
-  Planetary Institute for its map, and for Earth NASA Goddard Space Flight Center for the Blue
-  Marble, NASA Earth Observatory for the Black Marble and NOAA for the GOES data.
+  Planetary Institute for its map, for Earth NASA Goddard Space Flight Center for the Blue
+  Marble, NASA Earth Observatory for the Black Marble and NOAA for the GOES data, and for Mars
+  ESA/DLR/FU Berlin for the HRSC mosaics and NASA/JPL/Arizona State University for the TES map.
 - The spheres, the manifest and the scripts are OpenReliant's, under the Mozilla Public License
   2.0.

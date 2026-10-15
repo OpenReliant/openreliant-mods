@@ -1,7 +1,7 @@
 -- Realistic Planets: sets how each body turns and leans in OpenReliant's table of planets
 -- (records.planets), makes the planets' light white, sets the rings that the haze beyond the disk
--- of each planet and Titan is drawn on, and makes Earth a planet, so that only the sun lights it,
--- like the others. This is a load script, so it runs once as OpenReliant starts.
+-- of each planet and Titan is drawn on, makes Earth a planet, so that only the sun lights it,
+-- like the others, and adds Mars. This is a load script, so it runs once as OpenReliant starts.
 
 local records = require("openreliant.records")
 
@@ -35,6 +35,7 @@ local BODIES = {
     calisto = { day = 400.54, tilt = 3.13 },
     venus = { day = -120, tilt = 2.64, haze = { surface = "venus_haze", inner = 0.98, outer = 1.012 } },
     earth = { day = 23.934, tilt = 23.44, haze = { surface = "earth_haze", inner = 0.98, outer = 1.026 } },
+    mars = { day = 24.623, tilt = 25.19, haze = { surface = "mars_haze", inner = 0.98, outer = 1.07 } },
 }
 
 -- Which way each north pole leans: toward the body's left, -X, in the orientation the mission gives
@@ -49,10 +50,11 @@ local TILT_TOWARD = -math.pi / 2
 -- function (planets.luau) on a ring from `inner` to `outer` times its radius. The ring reaches
 -- past where haze.glsl cuts the haze off, 20 scale heights above the edge: about 340 km for
 -- Neptune, 440 km for Uranus, 380 km for Jupiter, 70 km for Venus and 160 km for Earth, one or two
--- hundredths of their radii, and 600 km for Titan, a fifth of its radius. OpenReliant uses half
--- the widest span of a planet's model as its radius, which for Saturn is the outer edge of its
--- rings, 141,000 km. So Saturn's haze ring runs from just inside its polar edge, 54,364 km, to
--- 1,000 km above its equator, beyond the 810 km that its haze reaches.
+-- hundredths of their radii, 220 km for Mars, seven hundredths, and 600 km for Titan, a fifth of
+-- its radius. OpenReliant uses half the widest span of a planet's model as its radius, which for
+-- Saturn is the outer edge of its rings, 141,000 km. So Saturn's haze ring runs from just inside
+-- its polar edge, 54,364 km, to 1,000 km above its equator, beyond the 810 km that its haze
+-- reaches.
 local function apply(planet, body)
     planet.spin = 2 * math.pi * TIME_SCALE / (body.day * 3600)
     planet.tilt = math.rad(body.tilt)
@@ -75,3 +77,13 @@ for n = 1, #planets do
 end
 planets[#planets + 1] = { type = "earth" }
 apply(planets[#planets], BODIES.earth)
+
+-- Mars, the type this mod adds in mod.ini. The records take it by its qualified name, after the
+-- mod's folder or archive, realistic-planets. In a folder of another name the name isn't found;
+-- Mars then keeps Venus's entry, its base's, and the rest of this script still counts.
+local named = pcall(function()
+    planets[#planets + 1] = { type = "realistic-planets:mars" }
+end)
+if named then
+    apply(planets[#planets], BODIES.mars)
+end

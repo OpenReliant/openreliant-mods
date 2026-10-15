@@ -43,6 +43,11 @@ python3 sphere.py "$work/earth.obj" --radius 1048542 --centre -752661.5 5579.5 -
     --name earth
 "$sltool" shp from-obj "$work/earth.obj" "$mod/earth.shp"
 
+# Mars isn't in the game, so its sphere has the radius of the game's planets, with Mars's polar radius
+# of 3,376.2 km to its equator's 3,396.2 (IAU). It's a single model, as Earth's is.
+python3 sphere.py "$work/mars.obj" --radius 1280625 --polar 1273083 --texture realistic_planets_mars --name mars
+"$sltool" shp from-obj "$work/mars.obj" "$mod/mars.shp"
+
 # Saturn and its ring, at their real proportions: radii of 60,268 and 54,364 km (IAU), and the ring
 # from 74,000 to 141,000 km, as its texture is. They're scaled so that the A ring's outer edge,
 # 136,770 km out, falls where the original's ring ends, 4,640,000 units out, which is 33.93 units a

@@ -1,13 +1,14 @@
 -- Realistic Planets: lights each body to match its measured photometry with Minnaert's law
--- (minnaert.glsl), draws the haze or air of the planets and Titan (haze.glsl, included by each
--- body's shader), shades Saturn with its ring, and shows Earth's city lights at night. This is a
--- player script, so it runs for the whole game. The functions need PER-PIXEL LIGHTING.
+-- (minnaert.glsl), draws the haze, air or dust of the planets and Titan (haze.glsl, included by
+-- each body's shader), shades Saturn with its ring, and shows Earth's city lights at night. This
+-- is a player script, so it runs for the whole game. The functions need PER-PIXEL LIGHTING.
 -- records.luau sets how the bodies turn and lean, and which rings their haze is drawn on.
 
 local shaders = require("openreliant.shaders")
 
 -- The smallest cosine of the view angle that the planets' and Titan's exponents were fitted to,
--- and the one for the other moons. Closer to the limb, the law keeps the value it has there.
+-- and the one for Mars and the other moons. Closer to the limb, the law keeps the value it has
+-- there.
 local PLANET_LEAST_COSINE = 0.25
 local MOON_LEAST_COSINE = 0.2
 
@@ -52,6 +53,10 @@ register("venus", "venus.glsl", { 1.070, 1.077, 0.982 }, PLANET_LEAST_COSINE, tr
 -- at 470 nm and 0.907 at 640), at 601, 540 and 452 nm for a grey spectrum, with blue using the
 -- value at 470. earth.glsl also draws its city lights on the night side.
 register("earth", "earth.glsl", { 0.871, 0.815, 0.750 }, PLANET_LEAST_COSINE, true)
+
+-- Mars: Hubble's frames of August 2003 (0.473 at 410 nm, 0.549 at 502, 0.633 at 588, 0.628 at 631
+-- and 0.703 at 673), at 608, 545 and 455 nm.
+register("mars", "mars.glsl", { 0.630, 0.591, 0.511 }, MOON_LEAST_COSINE, true)
 
 -- Titan: Cassini's frames of 2010 (0.876 at 463 nm, 0.897 at 568 and 0.855 at 647), at 606, 544
 -- and 455 nm.

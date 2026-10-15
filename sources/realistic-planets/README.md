@@ -50,10 +50,14 @@ Run each script from its own folder, in this order:
    pictures, about 740 MB, into `earth/data`, prints the limb's exponents for `planets.luau`, and
    makes `realistic_planets_earth.png` and its city lights, `realistic_planets_earth_emissive.png`.
    It takes about a minute.
-9. `build.sh` builds the spheres, Saturn's with its ring, with `sphere.py` and `sltool shp
+9. `mars/build.sh` downloads Mars Express's HRSC mosaics, MGS's TES albedo map and Hubble's frames of
+   Mars from 2003, about 790 MB, into `mars/data`, prints the limb's exponents for `planets.luau`, and
+   the markings' contrast and the south cap's brightness for `mars/compose.py`, and makes
+   `realistic_planets_mars.png`. It takes about three minutes.
+10. `build.sh` builds the spheres, Saturn's with its ring, with `sphere.py` and `sltool shp
    from-obj`, and the thumbnail, `mod.png`, with `render.py`. Set `SLTOOL` if `sltool` isn't on your
    `PATH`.
-10. `paper/build.sh` makes the note's figures with `paper/figures.py` and typesets
+11. `paper/build.sh` makes the note's figures with `paper/figures.py` and typesets
    `paper/neptune.tex` into `neptune-voyager-map.pdf` in the mod's folder. `figures.py` also prints
    every number the note quotes, so that a new build can be checked against the text.
 
@@ -103,6 +107,12 @@ Run each script from its own folder, in this order:
 | `earth/limb.py` | Measures the limb's exponents from the two satellites' pictures of the same moment |
 | `earth/compose.py` | Composes the texture from the Blue Marble, with the haze GOES-18 sees added back |
 | `earth/nightlights.py` | Makes the city lights, the texture's emissive map, from the Black Marble |
+| `mars/fetch.py` | Downloads the HRSC mosaics, the TES map and Hubble's frames |
+| `mars/hrsc.py` | Reads the HRSC mosaics, and gives their reflectance at any wavelength between their filters, shared by Mars's scripts |
+| `mars/tes.py` | Reads the TES albedo map, its poles filled, shared by Mars's scripts |
+| `mars/spectrum.py` | Mars's geometric albedo spectrum from Mallama's albedos |
+| `mars/hubble.py` | Fits each Hubble frame's pointing against the HRSC mosaics, and measures the limb's exponents, how strongly the markings follow the TES map's, and the south cap's brightness |
+| `mars/compose.py` | Composes the texture from the HRSC mosaics' detail, the TES map's broad markings and the spectrum, with the polar caps |
 | `paper/neptune.tex` | The note |
 | `paper/figures.py` | The note's figures and numbers |
 
