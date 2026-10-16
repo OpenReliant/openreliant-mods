@@ -18,8 +18,11 @@ the draft. The briefing, the objectives and the debriefings are written for the 
   Saturn and tried a surprise attack on Alliance HQ around Neptune. The Tigers and Ronin, flying off
   the Yamato, cut the force off from Alliance Command and led the assault, destroying several enemy
   vessels and support craft, and the Coalition retreated to its own lines.
-- **A campaign flag:** if the Krasnaya got away in mission 8, she sails with this convoy, and the
-  Ronin go after her. If she didn't, two cruisers take her place.
+- **A campaign flag:** the script is written for the Krasnaya to sail with this convoy if she got
+  away in mission 8, with the Ronin going after her, and for two cruisers to take her place if she
+  didn't. But it sets the flag, `krasnaya_alive`, to 0 as it starts, before it reads it, so the
+  cruisers always come. The Krasnaya's part of the script also names her components by an older
+  model's numbers, and the mod leaves it as it is.
 
 ## What the files say
 

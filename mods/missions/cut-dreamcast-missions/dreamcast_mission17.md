@@ -160,8 +160,16 @@ Written for the mod, for the ratings the mission can reach.
   mission 27 does, so the script waited for the hull to go, made the hull invulnerable, and set it
   as the player's target, and destroying the generator moved nothing on. The mod's file names the
   generator 6 in the two triggers and five commands that name it, and aims the one torpedo of the
-  Cougars' first run that the old numbering sent at the generator, gone by then, at the hull. The
-  old model's other numbers aren't known, so the other torpedoes keep theirs.
+  Cougars' first run that the old numbering sent at the generator, gone by then, at the hull.
+- **The Cougars' torpedoes:** the Gegarin goes down once all four torpedoes of the bombers' first
+  run are gone and the second run's has hit her. The old model's hull was 0, as mission 271, an
+  older version of mission 27 on the PC's disc, shows: its torpedoes aimed at 0 are aimed at 4, the
+  hull, in mission 27. On the PC, 0 is the belly engine. The mod's file aims the two torpedoes at
+  the old 0, one of the first run and the second run's, at the hull. The other two keep their
+  numbers, which aren't known. A torpedo goes off against whatever part it strikes, so the first
+  torpedoes can destroy the parts the later ones are aimed at, and a torpedo aimed at a part that's
+  gone flies on for good, so the second run never came. The mod's `fixes17.luau` aims a friendly
+  torpedo whose part of the Gegarin is gone at her hull.
 - **The fighter count:** the generator becomes the objective once the script has counted 11 of the
   14 fighters of the squad "(AI)All badfighters after 2nd ast launch" destroyed. The part that
   counts them ends with `InterruptTriggerCode`, which makes a trigger's code wait for its trigger to

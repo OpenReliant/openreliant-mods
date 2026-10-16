@@ -10,31 +10,38 @@ out.
 ## The missions
 
 `mission12.dte`, `mission13.dte`, `mission17.dte` and `mission22.dte` are the Dreamcast disc's, as
-they are but for 9 bytes of mission 17. The disc's `RESOURCE.HOG` uses the PC's archive format, so
+they are but for 3 bytes of mission 12 and 11 of mission 17. The disc's `RESOURCE.HOG` uses the PC's archive format, so
 `sltool` takes them out:
 
 ```bash
 sltool hog extract RESOURCE.HOG dreamcast
 ```
 
-Mission 17 was made for an older model of the Pukov, the Gegarin's class, which numbered its shield
-generator 4. The PC's Pukov numbers its hull 4 and its shield generator 6, so the script waited for
-the hull to go, and destroying the generator moved nothing on
-([OpenReliant#1197](https://github.com/OpenReliant/openreliant/issues/1197)). `patch_mission17.py`
-renumbers the generator in the script's two triggers and five commands that name it, and aims the
-one torpedo that the old numbering sent at the generator, gone by then, at the hull.
+The missions were made for older models of their capital ships, which numbered their components
+differently. The Dreamcast's own models number them as the PC's do, so the old numbers belong to
+neither release. Mission 17 was made for an older Pukov, the Gegarin's class, which numbered its
+shield generator 4 and its hull 0. The PC's Pukov numbers its hull 4 and its shield generator 6, so
+the script waited for the hull to go, and destroying the generator moved nothing on
+([OpenReliant#1197](https://github.com/OpenReliant/openreliant/issues/1197)). `patch_missions.py`
+renumbers the generator in the script's two triggers and five commands that name it, aims the one
+torpedo that the old numbering sent at the generator, gone by then, at the hull, and aims the two
+it sent at the old hull at the PC's. Mission 271, an older version of mission 27 on the PC's disc,
+shows the old numbers. Mission 22 names the Krasnaya's parts by old numbers too, but the branch
+that brings her never runs, since the script sets `krasnaya_alive` to 0 before it reads it.
 
-The part that counts the destroyed fighters ends with `InterruptTriggerCode`, which makes a
-trigger's code wait for its trigger to fire again. The part runs on a thread that no trigger
-started, so it waits forever, and each kill keeps a thread. The script has 32 threads, so the count
-can stop short of 11 once they run out, and then the generator's trigger can't run either. The
-original game runs the script the same way. `patch_mission17.py` puts `MultiPlayerSync` in its place,
-which outside a network game yields once and lets the part end.
+A part that ends with `InterruptTriggerCode`, which makes a trigger's code wait for its trigger to
+fire again, waits forever on a thread that no trigger started. Mission 17 counts the destroyed
+fighters that way: each kill keeps a thread, and once the script's 32 run out, the count can stop
+short of 11, and then the generator's trigger can't run either. Mission 12 plays the Reliant's line
+for each Kamov torpedo hit that way, so only the first hit's line played and the fourth hit didn't
+destroy her. The original game runs the script the same way. `patch_missions.py` puts
+`MultiPlayerSync` in place of each of these waits, which outside a network game yields once and
+lets the thread go on.
 
 The script checks each byte before it changes it:
 
 ```bash
-python3 patch_mission17.py dreamcast/mission17.dte mission17.dte
+python3 patch_missions.py dreamcast .
 ```
 
 ## The scripts
@@ -65,6 +72,10 @@ python3 patch_mission17.py dreamcast/mission17.dte mission17.dte
 - `targets22.luau`, run with mission 22, is the mod's own help with its crowded last part: from the
   Badinov's on, each shield generator the player can hit becomes the target, and the primary
   target, in turn.
+- `fixes17.luau`, run with mission 17, aims a friendly torpedo whose part of the Gegarin is gone at
+  her hull. A torpedo goes off against whatever part it strikes, so the Cougars' first torpedoes
+  can destroy the parts the later ones are aimed at, and a torpedo aimed at a part that's gone flies
+  on for good, and the mission waits for it.
 - `fixes22.luau`, run with mission 22, fixes flaws of its draft script, two of which leave it with
   no way to finish: the Hades bombers take no damage, a friendly torpedo that ends without hitting
   its target still destroys it, the convoy's count no longer misses a ship destroyed within two

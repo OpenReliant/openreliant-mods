@@ -149,6 +149,17 @@ ends the pilot's career instead.
 - **Partial failure:** "one more torpedo hit would have probably broken the spine of the ship", a
   warning to keep the torpedoes off, and Petrov got away.
 
+## What the mod changes
+
+- **The Reliant's torpedo hits:** each Kamov torpedo that hits the Reliant runs a part that plays
+  her line for the number of hits so far, and destroys her at the fourth. The part waits between
+  the hits with `InterruptTriggerCode`, which makes a trigger's code wait for its trigger to fire
+  again. Each hit runs the part on a thread of its own that no trigger started, so each thread
+  stops at its first wait: only the first hit's line played, and the fourth hit didn't destroy the
+  Reliant. The original game runs the script the same way. The mod's file has `MultiPlayerSync` in
+  place of each wait, which outside a network game yields once and lets the thread go on, so each
+  hit plays its own line and the fourth destroys her.
+
 ## Open points for the mod
 
 - **Faces:** the Dreamcast file gives most speakers the wrong face (an older pilot table). The mod
