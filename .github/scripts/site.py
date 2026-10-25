@@ -1,9 +1,10 @@
 """Writes the mods' site into site/: the index page, which browses the mods by category, with each
 mod's thumbnail, name, version, author, what it needs, its description and the download of its
 latest release; a page for each mod, mods/<mod>/, with its pictures, what it is, its download, its
-total downloads and its releases; updates/, every mod's releases, newest first; and mods.json, the
+total downloads and its releases; updates/, every mod's releases, newest first; mods.json, the
 released mods as data, which OpenReliant's GET MODS screen reads to list and install them from the
-game.
+game; and sitemap.xml, the pages for search engines, which robots.txt at the root of
+openreliant.github.io names.
 
     python3 .github/scripts/site.py
 """
@@ -22,8 +23,16 @@ from mods import ROOT, REPOSITORY, Category, Mod, all_categories, git, problems,
 SITE = ROOT / "site"
 # The site's address. mods.json uses absolute links, since the game reads it from anywhere.
 SITE_URL = "https://openreliant.github.io/openreliant-mods/"
-# OpenReliant's icon, which OpenReliant's own site publishes: the pages' favicon.
+# OpenReliant's icon, which OpenReliant's own site publishes: the pages' favicon, and the picture a
+# link to a page without one of its own shows.
 ICON_URL = "https://openreliant.github.io/openreliant/icon/"
+# The site's name, which every page's title ends with, so that a search for StarLancer's mods
+# finds it.
+SITE_NAME = "StarLancer mods for OpenReliant"
+# The longest description of a page, about what a search result shows, and the shortest that is
+# cut at the end of a sentence rather than at a word.
+LONGEST_DESCRIPTION = 160
+SHORTEST_DESCRIPTION = 80
 # The format number of mods.json. Raise it when a key changes meaning. Adding a key doesn't need
 # it: OpenReliant ignores keys it doesn't know.
 INDEX_FORMAT = 1
@@ -302,7 +311,7 @@ BROWSE_SCRIPT = """
       how.textContent = "Here's how to send it in";
       emptyText.append(how, ".");
     } else emptyText.append("No mods here match the search.");
-    document.title = here.path ? `${here.name}: OpenReliant mods` : "OpenReliant mods";
+    document.title = here.path ? `${here.name}: ${document.body.dataset.site}` : document.body.dataset.site;
   }
 
   search.addEventListener("input", () => { state.q = search.value.trim(); history.replaceState(null, "", address(state.category)); show(); });
@@ -332,18 +341,33 @@ DETAIL_SCRIPT = """
 """
 
 
-def page(title: str, description: str, current: str, base: str, body: str, scripts: list[str]) -> str:
-    """A page of the site, with the top bar's `current` link lit: `body` under it, then `scripts`.
-    `base` leads from the page back to the site's top, such as ../ from updates/."""
+def page(title: str, description: str, path: str, current: str, base: str, body: str, scripts: list[str], image: str = "") -> str:
+    """The page of the site at `path` from its top, such as updates/, with the top bar's `current`
+    link lit: `body` under it, then `scripts`. `base` leads from the page back to the site's top,
+    such as ../ from updates/. The title ends with the site's name, and the description is cut to
+    fit a search result (`shortened`). `image`, a picture's address, is what a link to the page
+    shows in chats and on social sites, and OpenReliant's icon without one."""
     lit = lambda name: ' current' if name == current else ''
     script_tags = "".join(f"<script>{script}</script>" for script in scripts)
+    text = html.escape
+    full_title = f"{title}: {SITE_NAME}" if title else SITE_NAME
+    summary = shortened(description)
+    address = SITE_URL + path
     return f"""<!doctype html>
 <html lang="en">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>{html.escape(title)}</title>
-<meta name="description" content="{html.escape(description)}">
+<title>{text(full_title)}</title>
+<meta name="description" content="{text(summary)}">
+<link rel="canonical" href="{text(address)}">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="{text(SITE_NAME)}">
+<meta property="og:title" content="{text(full_title)}">
+<meta property="og:description" content="{text(summary)}">
+<meta property="og:url" content="{text(address)}">
+<meta property="og:image" content="{text(image or ICON_URL + 'openreliant-256.png')}">
+<meta name="twitter:card" content="{'summary_large_image' if image else 'summary'}">
 <link rel="icon" href="{ICON_URL}openreliant-32.png" sizes="32x32" type="image/png">
 <link rel="icon" href="{ICON_URL}openreliant.svg" type="image/svg+xml">
 <link rel="apple-touch-icon" href="{ICON_URL}openreliant-256.png">
@@ -352,7 +376,7 @@ def page(title: str, description: str, current: str, base: str, body: str, scrip
 <link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@500;600;700&display=swap" rel="stylesheet">
 <style>{STYLE}</style>
 </head>
-<body>
+<body data-site="{text(SITE_NAME)}">
 <main>
 <nav class="top">
 <a class="brand" href="https://openreliant.github.io/openreliant/">Open<span>Reliant</span></a>
@@ -370,6 +394,18 @@ def page(title: str, description: str, current: str, base: str, body: str, scrip
 </body>
 </html>
 """
+
+
+def shortened(text: str) -> str:
+    """`text` as a page's description: whole where it fits, else cut after its last sentence that
+    fits, or at a word."""
+    if len(text) <= LONGEST_DESCRIPTION:
+        return text
+    end = text.rfind(". ", 0, LONGEST_DESCRIPTION) + 1
+    if end >= SHORTEST_DESCRIPTION:
+        return text[:end]
+    fits = text[: LONGEST_DESCRIPTION - len("...")]
+    return fits[: fits.rfind(" ")].rstrip(",;:") + "..."
 
 
 def latest_openreliant() -> dict | None:
@@ -610,7 +646,8 @@ def mod_page(mod, by_path: dict[str, Category], release: dict | None, releases: 
 <footer>
 <p><a href="https://github.com/{REPOSITORY}">The mods' sources</a>, with each mod's credits and licence. Updated {text(built)}. Headings are set in Newtown, by Roger White, from Roger's Fonts.</p>
 </footer>"""
-    return page(f"{mod.name}: OpenReliant mods", mod.description or f"{mod.name}, a mod for OpenReliant.", "mods", base, body, [DETAIL_SCRIPT])
+    image = f"{SITE_URL}thumbs/{mod.id}.png" if mod.thumbnail else ""
+    return page(mod.name, mod.description or f"{mod.name}, a mod for StarLancer in OpenReliant.", mod.page, "mods", base, body, [DETAIL_SCRIPT], image)
 
 
 def crumbs_of(category: Category, by_path: dict[str, Category], base: str) -> str:
@@ -654,7 +691,7 @@ def index_page(root: Category, release: dict | None, releases: list[dict], updat
 <p><a href="https://github.com/{REPOSITORY}">The mods' sources</a>, with each mod's credits and licence. Updated {text(updated)}. Headings are set in Newtown, by Roger White, from Roger's Fonts.</p>
 </footer>
 <script type="application/json" id="categories">{categories}</script>"""
-    return page("OpenReliant mods", "Mods for OpenReliant, checked to work and to be free to share.", "mods", "", body, [BROWSE_SCRIPT])
+    return page("", "Mods for StarLancer in OpenReliant: new ships, sharper textures and models, missions, music and scripts, each checked to work and to be free to share.", "", "mods", "", body, [BROWSE_SCRIPT])
 
 
 def updates_page(root: Category, releases: list[dict], updated: str) -> str:
@@ -688,7 +725,7 @@ def updates_page(root: Category, releases: list[dict], updated: str) -> str:
 <footer>
 <p><a href="https://github.com/{REPOSITORY}/releases">Every release on GitHub</a>. Updated {text(updated)}. Headings are set in Newtown, by Roger White, from Roger's Fonts.</p>
 </footer>"""
-    return page("Updates: OpenReliant mods", "The latest releases of the mods for OpenReliant.", "updates", "../", body, [])
+    return page("Updates", "The latest releases of the StarLancer mods for OpenReliant, newest first, with what changed in each.", "updates/", "updates", "../", body, [])
 
 
 def index_json(mods: list[Mod], releases: list[dict], updated_at: dict[str, str], updated: str) -> str:
@@ -736,6 +773,16 @@ def index_json(mods: list[Mod], releases: list[dict], updated_at: dict[str, str]
     return json.dumps({"format": INDEX_FORMAT, "generated": updated, "mods": listed}, indent=2, ensure_ascii=False) + "\n"
 
 
+def sitemap(mods: list[Mod], updated_at: dict[str, str]) -> str:
+    """sitemap.xml: the site's pages for search engines, each mod's with the day of its latest
+    release where it has one, and the index and the updates with the day of the newest release."""
+    newest = max(updated_at.values(), default="")
+    pages = [("", newest), ("updates/", newest)] + [(mod.page, updated_at.get(mod.id, "")) for mod in sorted(mods, key=lambda mod: mod.page)]
+    entries = "".join(f"  <url><loc>{html.escape(SITE_URL + path)}</loc>" + (f"<lastmod>{day[:10]}</lastmod>" if day else "") + "</url>\n"
+                      for path, day in pages)
+    return f'<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n{entries}</urlset>\n'
+
+
 def main() -> int:
     root = tree()
     if found := problems(root):
@@ -766,6 +813,7 @@ def main() -> int:
     (SITE / "index.html").write_text(index_page(root, release, releases, updated_at, updated), encoding="utf-8")
     (SITE / "updates" / "index.html").write_text(updates_page(root, releases, updated), encoding="utf-8")
     (SITE / "mods.json").write_text(index_json(mods, releases, updated_at, updated), encoding="utf-8")
+    (SITE / "sitemap.xml").write_text(sitemap(mods, updated_at), encoding="utf-8")
     by_path = {category.path: category for category in all_categories(root)}
     for mod in mods:
         folder = SITE / mod.page
@@ -773,7 +821,7 @@ def main() -> int:
         for picture in mod.screenshots():
             shutil.copy(picture, folder / picture.name)
         (folder / "index.html").write_text(mod_page(mod, by_path, release, releases, updated_at.get(mod.id, ""), updated), encoding="utf-8")
-    print(f"wrote {SITE / 'index.html'}, {SITE / 'updates' / 'index.html'}, {SITE / 'mods.json'} and a page for each mod: {len(mods)} mods, {len(releases)} releases")
+    print(f"wrote {SITE / 'index.html'}, {SITE / 'updates' / 'index.html'}, {SITE / 'mods.json'}, {SITE / 'sitemap.xml'} and a page for each mod: {len(mods)} mods, {len(releases)} releases")
     return 0
 
 
