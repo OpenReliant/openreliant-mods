@@ -41,6 +41,7 @@ jobs:
       - name: Release
         env:
           GH_TOKEN: ${{ github.token }}
+          DISCORD_MOD_RELEASES_WEBHOOK: ${{ secrets.DISCORD_MOD_RELEASES_WEBHOOK }}
         run: python3 .github/scripts/release.py
 
   pages:

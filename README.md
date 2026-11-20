@@ -180,7 +180,9 @@ A mod's version is the `Version` in its `mod.ini`. To release it, raise the vers
    `.github/actions/sltool`;
 2. publishes the release `<mod>-v<version>`, such as `viper-v1.0`, with both files attached and
    the commits that changed the mod since its last release as its notes;
-3. rebuilds the [site](https://openreliant.github.io/openreliant-mods/): the mods by category, and
+3. posts the new release to `#mod-releases` if `DISCORD_MOD_RELEASES_WEBHOOK` is set in the
+   repository's Actions secrets. The post links to the mod's page and release notes;
+4. rebuilds the [site](https://openreliant.github.io/openreliant-mods/): the mods by category, and
    [the updates](https://openreliant.github.io/openreliant-mods/updates/), every release with what
    changed in it, newest first.
 

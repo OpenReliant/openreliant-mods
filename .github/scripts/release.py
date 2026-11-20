@@ -8,13 +8,17 @@ publishes a release with both attached.
 the sltool to run; sltool on the PATH by default.
 """
 
+import json
 import os
 import pathlib
 import subprocess
 import sys
+import time
+import urllib.error
 import urllib.parse
+import urllib.request
 
-from mods import ROOT, git, problems, tree
+from mods import REPOSITORY, ROOT, SITE_URL, Mod, git, problems, tree
 
 DIST = ROOT / "dist"
 
@@ -84,8 +88,39 @@ def notes(mod) -> str:
     return "\n".join(line for line in lines if line is not None)
 
 
+def announce(mod: Mod, webhook: str) -> None:
+    """Post the mod's page and release notes once GitHub has the files."""
+    page = SITE_URL + urllib.parse.quote(mod.page)
+    tag = urllib.parse.quote(mod.tag, safe="")
+    release = f"https://github.com/{REPOSITORY}/releases/tag/{tag}"
+    payload = {
+        "content": f"**{mod.name} {mod.version}**\n[Mod page]({page}) · [Release notes]({release})",
+        "allowed_mentions": {"parse": []},
+    }
+    request = urllib.request.Request(
+        f"{webhook}?wait=true",
+        data=json.dumps(payload).encode(),
+        headers={"Content-Type": "application/json", "User-Agent": "OpenReliant Mods GitHub Actions"},
+    )
+    for attempt in range(4):
+        try:
+            with urllib.request.urlopen(request, timeout=15):
+                return
+        except urllib.error.HTTPError as error:
+            with error:
+                if error.code != 429 or attempt == 3:
+                    print(f"::warning::Could not post {mod.tag} to Discord (HTTP {error.code}).", file=sys.stderr)
+                    return
+                delay = float(error.headers.get("Retry-After", "1"))
+            time.sleep(delay)
+        except (urllib.error.URLError, TimeoutError):
+            print(f"::warning::Could not reach Discord to post {mod.tag}.", file=sys.stderr)
+            return
+
+
 def main() -> int:
     dry_run = "--dry-run" in sys.argv[1:]
+    webhook = os.environ.get("DISCORD_MOD_RELEASES_WEBHOOK")
     root = tree()
     # A layout that's wrong releases nothing.
     if found := problems(root):
@@ -117,6 +152,8 @@ def main() -> int:
             check=True,
         )
         print(f"{mod.id}: released {mod.tag}")
+        if webhook:
+            announce(mod, webhook)
     return 1 if failed else 0
 
 
