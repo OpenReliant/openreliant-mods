@@ -18,11 +18,9 @@ import shutil
 import subprocess
 import sys
 
-from mods import ROOT, REPOSITORY, Category, Mod, all_categories, git, problems, tree, version_tuple
+from mods import ROOT, REPOSITORY, SITE_URL, Category, Mod, all_categories, git, problems, tree, version_tuple
 
 SITE = ROOT / "site"
-# The site's address. mods.json uses absolute links, since the game reads it from anywhere.
-SITE_URL = "https://openreliant.github.io/openreliant-mods/"
 # OpenReliant's icon, which OpenReliant's own site publishes: the pages' favicon, and the picture a
 # link to a page without one of its own shows.
 ICON_URL = "https://openreliant.github.io/openreliant/icon/"
