@@ -49,7 +49,7 @@ SOURCES = ROOT / "sources"
 PICTURES = (".png", ".jpg", ".jpeg", ".webp")
 EXTERNAL = ROOT / "external"
 REPOSITORY = "OpenReliant/openreliant-mods"
-SITE_URL = "https://openreliant.github.io/openreliant-mods/"
+SITE_URL = "https://mods.openreliant.space/"
 
 
 def section(path: pathlib.Path, name: str, keep_case: bool = False) -> dict[str, str]:
