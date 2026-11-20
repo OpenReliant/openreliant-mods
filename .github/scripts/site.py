@@ -3,8 +3,7 @@ mod's thumbnail, name, version, author, what it needs, its description and the d
 latest release; a page for each mod, mods/<mod>/, with its pictures, what it is, its download, its
 total downloads and its releases; updates/, every mod's releases, newest first; mods.json, the
 released mods as data, which OpenReliant's GET MODS screen reads to list and install them from the
-game; and sitemap.xml, the pages for search engines, which robots.txt at the root of
-openreliant.github.io names.
+game; and sitemap.xml and robots.txt for search engines.
 
     python3 .github/scripts/site.py
 """
@@ -23,7 +22,7 @@ from mods import ROOT, REPOSITORY, SITE_URL, Category, Mod, all_categories, git,
 SITE = ROOT / "site"
 # OpenReliant's icon, which OpenReliant's own site publishes: the pages' favicon, and the picture a
 # link to a page without one of its own shows.
-ICON_URL = "https://openreliant.github.io/openreliant/icon/"
+ICON_URL = "https://openreliant.space/icon/"
 # The site's name, which every page's title ends with, so that a search for StarLancer's mods
 # finds it.
 SITE_NAME = "StarLancer mods for OpenReliant"
@@ -37,8 +36,8 @@ INDEX_FORMAT = 1
 
 STYLE = """
 /* Newtown, by Roger White, from Roger's Fonts: the face OpenReliant draws the game's menus in, from
-   the OpenReliant website on the same host. */
-@font-face { font-family: "Newtown"; src: url("/openreliant/fonts/Newtown.ttf") format("truetype"); font-display: swap; }
+   the OpenReliant website. */
+@font-face { font-family: "Newtown"; src: url("https://openreliant.space/fonts/Newtown.ttf") format("truetype"); font-display: swap; }
 :root {
   --bg: #07080c; --card: #10131b; --card-edge: #232938; --text: #e8eaf0; --muted: #9aa3b5;
   --accent: #f08a2c; --accent-dim: #8a4a14; --red: #c8352a;
@@ -377,10 +376,10 @@ def page(title: str, description: str, path: str, current: str, base: str, body:
 <body data-site="{text(SITE_NAME)}">
 <main>
 <nav class="top">
-<a class="brand" href="https://openreliant.github.io/openreliant/">Open<span>Reliant</span></a>
+<a class="brand" href="https://openreliant.space/">Open<span>Reliant</span></a>
 <div class="links">
-<a class="keep" href="https://openreliant.github.io/openreliant/#download">Download</a>
-<a href="https://openreliant.github.io/openreliant/docs/">Docs</a>
+<a class="keep" href="https://openreliant.space/#download">Download</a>
+<a href="https://openreliant.space/docs/">Docs</a>
 <a class="keep{lit('mods')}" href="{base or './'}">Mods</a>
 <a class="keep{lit('updates')}" href="{base}updates/">Updates</a>
 <a href="https://github.com/{REPOSITORY}">GitHub</a>
@@ -665,7 +664,7 @@ def index_page(root: Category, release: dict | None, releases: list[dict], updat
     categories = json.dumps(data).replace("</", "<\\/")
     body = f"""<header>
 <h1>Mods</h1>
-<p>Mods for <a href="https://openreliant.github.io/openreliant/">OpenReliant</a>, checked to work and to be free to share. You need OpenReliant and your own copy of StarLancer.</p>
+<p>Mods for <a href="https://openreliant.space/">OpenReliant</a>, checked to work and to be free to share. You need OpenReliant and your own copy of StarLancer.</p>
 </header>
 <section class="browse" aria-label="Browse the mods" hidden>
 <nav class="crumbs" aria-label="Category"><ol></ol></nav>
@@ -812,6 +811,7 @@ def main() -> int:
     (SITE / "updates" / "index.html").write_text(updates_page(root, releases, updated), encoding="utf-8")
     (SITE / "mods.json").write_text(index_json(mods, releases, updated_at, updated), encoding="utf-8")
     (SITE / "sitemap.xml").write_text(sitemap(mods, updated_at), encoding="utf-8")
+    (SITE / "robots.txt").write_text(f"User-agent: *\nAllow: /\nSitemap: {SITE_URL}sitemap.xml\n", encoding="utf-8")
     by_path = {category.path: category for category in all_categories(root)}
     for mod in mods:
         folder = SITE / mod.page
