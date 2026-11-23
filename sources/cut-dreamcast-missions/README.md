@@ -114,6 +114,12 @@ python3 patch_kafelnikof.py game/Kafelnikof.SHP kafelnikof.gltf .
   than the next, so the script drops the boarding ship from any turret that picks it. And it disables
   the base's guns while the base is cloaked: the game lets a cloaked ship's turrets fire, which no
   released mission shows, and firing would give the hidden base away.
+- `boarding13.luau`, run with mission 13, keeps the boarding ship from harm while it holds off.
+  After each drop-off and pickup the script sends it to "Limpet hold off point", far from the base,
+  and the Basilisks it then sends at the wing and the boarding ship hunt it there: they destroyed it
+  within seconds of reaching it. It is invulnerable from being sent there until it is sent back in,
+  and the wing still has to protect it on its runs to and from the base. The script only undoes
+  the invulnerability it gave.
 - `fixes17.luau`, run with mission 17, aims a friendly torpedo whose part of the Gegarin is gone at
   her hull. A torpedo goes off against whatever part it strikes, so the Cougars' first torpedoes
   can destroy the parts the later ones are aimed at, and a torpedo aimed at a part that's gone flies

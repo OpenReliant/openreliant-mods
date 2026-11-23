@@ -194,6 +194,11 @@ Written for the mod, for the ratings the mission can reach. The ITAC shows each 
   for it. The mod's model turns both ports over and moves the bottom vent's port to the hatch, at
   the mouth of the hole it leaves, and the mod's `mission13.dte` moves the waypoint the wing
   escorts that run to, "Limpet Dock Point 2", over the hatch.
+- **The boarding ship holding off:** after each drop-off and pickup the script sends the boarding
+  ship to wait far from the base, and the Basilisks it sends at the wing and the boarding ship
+  hunt it there, destroying it within seconds. In the cut data it docked inside the rock, which
+  likely shielded it. The mod's `boarding13.luau` makes it invulnerable while it holds off; on its
+  runs to and from the base the wing still has to protect it.
 - **The machinery's names:** the base's parts have no class, so the target display named none of
   them. The mod's model makes the cloak generator a shield generator, the nearest class the game
   names, the comms tower a comms transmitter and the service hatch a vent hatch. A shield
