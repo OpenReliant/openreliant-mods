@@ -186,7 +186,8 @@ Written for the mod, for the ratings the mission can reach. The ITAC shows each 
   degrees of straight out from the rock. The mod's `mission13.dte` adds them to the squad the script
   sends the wing after to clear the boarding ship's way in, "(AI)Critical Kafelnikof defence", and
   its `turrets13.luau` keeps them from aiming at the boarding ship, so that it meets the Basilisks
-  the mission sends at it with its shields up.
+  the mission sends at it with its shields up. The game also lets a cloaked ship's turrets fire, so
+  `turrets13.luau` disables the base's guns while it is cloaked.
 - **The boarding ship's docking:** the base's two docking ports point out of the rock, so the
   boarding ship slid in from inside the rock and docked with its body sunk in it. And its second
   run docked at the bottom vent, on the far side of the base from the service hatch the wing blows

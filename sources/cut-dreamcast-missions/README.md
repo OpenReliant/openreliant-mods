@@ -111,7 +111,9 @@ python3 patch_kafelnikof.py game/Kafelnikof.SHP kafelnikof.gltf .
   ship. A turret aims at any ship not of its side, and the turrets the mod's model lets fire wore
   down its shields as it docked, before the Basilisks the mission sends at it arrive. The turrets
   step before the scripts in each game frame, and a turret fires at a target it picked no sooner
-  than the next, so the script drops the boarding ship from any turret that picks it.
+  than the next, so the script drops the boarding ship from any turret that picks it. And it disables
+  the base's guns while the base is cloaked: the game lets a cloaked ship's turrets fire, which no
+  released mission shows, and firing would give the hidden base away.
 - `fixes17.luau`, run with mission 17, aims a friendly torpedo whose part of the Gegarin is gone at
   her hull. A torpedo goes off against whatever part it strikes, so the Cougars' first torpedoes
   can destroy the parts the later ones are aimed at, and a torpedo aimed at a part that's gone flies
