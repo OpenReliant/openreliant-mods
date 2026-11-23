@@ -10,8 +10,8 @@ out.
 ## The missions
 
 `mission12.dte`, `mission13.dte`, `mission17.dte` and `mission22.dte` are the Dreamcast disc's, as
-they are but for 3 bytes of mission 12 and 11 of mission 17. The disc's `RESOURCE.HOG` uses the PC's archive format, so
-`sltool` takes them out:
+they are but for 3 bytes of mission 12, 12 of mission 13 and 11 of mission 17. The disc's
+`RESOURCE.HOG` uses the PC's archive format, so `sltool` takes them out:
 
 ```bash
 sltool hog extract RESOURCE.HOG dreamcast
@@ -37,6 +37,12 @@ for each Kamov torpedo hit that way, so only the first hit's line played and the
 destroy her. The original game runs the script the same way. `patch_missions.py` puts
 `MultiPlayerSync` in place of each of these waits, which outside a network game yields once and
 lets the thread go on.
+
+Mission 13's two Kurgans start beside the Kafelnikof, either side of it, and chase the 45th's
+fighters across it. Two ships that list components never collide, and the game's avoidance gives
+up once a ship is inside the other's box, which on the Kafelnikof is far larger than its rock, so
+they flew through the rock. `patch_missions.py` starts them 60000 nearer the 45th's jump-in point,
+ahead of the base.
 
 The script checks each byte before it changes it:
 

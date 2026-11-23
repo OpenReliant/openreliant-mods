@@ -174,6 +174,11 @@ Written for the mod, for the ratings the mission can reach. The ITAC shows each 
 - **Voices:** the 51 lines are voiced, and so is Enriquez's briefing, as `dreamcast_brief13`.
 - **Debriefings and briefing hologram:** OpenReliant can't yet give a mod's mission its own
   debriefings and briefing speech ([#976](https://github.com/OpenReliant/openreliant/issues/976)).
+- **The Kurgans:** they start beside the base, either side of it, and chased the 45th's fighters
+  across it. Two ships that list components never collide, and the game's avoidance gives up once a
+  ship is inside the base's box, which is far larger than its rock, so they flew through the rock.
+  The mod's `mission13.dte` starts them 60000 nearer the 45th's jump-in point, ahead of the base
+  (`patch_missions.py`).
 - **The turrets:** the base's model was left unfinished. 13 of its 16 turrets have empty firing
   arcs, so they never fire, 10 of them stand upside down, sunk in the rock, and 3 more lie under the
   second of the base's two rocks. The mod's `Kafelnikof.SHP` stands them on the rock, facing along

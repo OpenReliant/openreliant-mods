@@ -1,10 +1,11 @@
-"""Fixes flaws of the Dreamcast's missions 12 and 17 that leave them with no way to finish, or
-without the end their scripts give them, and writes the files the mod ships.
+"""Fixes flaws of the Dreamcast's missions 12, 13 and 17 that leave them with no way to finish,
+without the end their scripts give them, or with ships flying through rock, and writes the files
+the mod ships.
 
     python3 patch_missions.py <the Dreamcast's mission files> <out folder>
 
-The first folder holds the disc's mission12.dte and mission17.dte, as `sltool hog extract
-RESOURCE.HOG` writes them. Missions 13 and 22 need no change.
+The first folder holds the disc's mission12.dte, mission13.dte and mission17.dte, as `sltool hog
+extract RESOURCE.HOG` writes them. Mission 22 needs no change.
 
 The missions were made for older models of capital ships, which numbered their components
 differently. The Dreamcast's own models number them as the PC's do, so the missions' numbers belong
@@ -43,9 +44,16 @@ that no trigger started, so each thread stops at its first wait: only the first 
 and the fourth hit doesn't destroy her. MultiPlayerSync takes each wait's place, so each hit's
 thread plays the line for the count of hits so far and ends.
 
+Mission 13: the two Kurgans that patrol the Kafelnikof start beside the base, either side of it.
+As they attack the 45th, they chase its fighters across the base, and the game's avoidance gives
+up once a ship is inside the base's box, which is far larger than its rock: two ships that list
+components never collide, so the Kurgans flew through the rock. They start 60000 nearer the
+45th's jump-in point instead, ahead of the base, where they meet the wing on its way in.
+
 Each byte is checked before it's changed, so the script refuses any other file.
 """
 import os
+import struct
 import sys
 
 # The sections' places in each file, from its directory (`sltool dte sections`): the same in both.
@@ -71,6 +79,14 @@ MISSION17_PUSHES = (
 )
 MISSION17_WAITS = (5043,)
 
+# Mission 13: the Kurgans' records, by the place of their positions in the file: the position the
+# mission gives, and the copy the loader keeps, 0x14 bytes before it; and where each starts.
+MISSION13_SHIP_POSITIONS = (
+    (0x32D2B, (-72533.328125, 0.0, 98055.7578125), (-72533.328125, 0.0, 38055.7578125)),
+    (0x32D77, (58466.66015625, 0.0, 98578.53125), (58466.66015625, 0.0, 38578.53125)),
+)
+LOADER_COPY = -0x14
+
 # Mission 12: the Reliant's torpedo lines' three InterruptTriggerCodes.
 MISSION12_WAITS = (4366, 4430, 4494)
 
@@ -95,6 +111,13 @@ class Mission:
                 sys.exit(f"the script at {at} isn't a push of the ship's component: this isn't the Dreamcast's {self.name}")
             self.change(SCRIPT + at + 2, old, new)
 
+    def positions(self, changes):
+        for at, old, new in changes:
+            for place in (at, at + LOADER_COPY):
+                if struct.unpack_from('<3f', self.image, place) != old:
+                    sys.exit(f"the ship's position at {place:#x} isn't {old}: this isn't the Dreamcast's {self.name}")
+                struct.pack_into('<3f', self.image, place, *new)
+
     def waits(self, places):
         for at in places:
             for offset, (old, new) in enumerate(zip(INTERRUPT_TRIGGER_CODE, MULTIPLAYER_SYNC)):
@@ -111,6 +134,7 @@ def patch(source, out, name, changes):
 def main():
     source, out = sys.argv[1], sys.argv[2]
     patch(source, out, 'mission12.dte', lambda m: m.waits(MISSION12_WAITS))
+    patch(source, out, 'mission13.dte', lambda m: m.positions(MISSION13_SHIP_POSITIONS))
 
     def mission17(m):
         m.triggers(MISSION17_TRIGGERS)
