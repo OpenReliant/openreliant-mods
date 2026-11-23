@@ -168,7 +168,9 @@ Written for the mod, for the ratings the mission can reach. The ITAC shows each 
 - **Faces:** the mission's comms give the wrong faces. The mod sets the speaking ships' pilots as
   the mission starts (the wing leader's Patriot to Bandit, the Tempest to Diceman, the boarding ship
   to the Marine leader, whose face and voice mission 11's boarding ship has), and maps the pilot
-  numbers its comms commands use: 103 to Stahl, 102 to Moose.
+  numbers its comms commands use: 103 to Stahl, 102 to Moose. The base's gun and missile satellites fly with no
+  pilot. Without one in the file, the game gives a hostile ship a fighter pilot's, whose voice
+  would taunt the player each time a satellite's shot strikes.
 - **Voices:** the 51 lines are voiced, and so is Enriquez's briefing, as `dreamcast_brief13`.
 - **Debriefings and briefing hologram:** OpenReliant can't yet give a mod's mission its own
   debriefings and briefing speech ([#976](https://github.com/OpenReliant/openreliant/issues/976)).

@@ -31,8 +31,10 @@ local missions = {
         ships = { [5] = 6, [4] = 5, [7] = 188, [1] = 5, [6] = 60 },
         -- Stahl with his Marines, and Moose.
         pilots = { [103] = 72, [102] = 4 },
-        -- The Black Guard's Basilisks, and Kurgans.
-        types = { basilisk = 9, kurgan = 47 },
+        -- The Black Guard's Basilisks, and Kurgans. The base's gun and missile satellites fly with
+        -- no pilot, so they say nothing, like the mines: the game gives a hostile ship without one
+        -- a fighter pilot's, whose voice taunts the player each time a satellite's shot strikes.
+        types = { basilisk = 9, kurgan = 47, grazer_gun_sat = "none", archer_missile_sat = "none" },
     },
     [17] = {
         -- Bandit's Grendel, the Reliant, the Gegarin, Gamma's two Hades, the Mitchell and the
