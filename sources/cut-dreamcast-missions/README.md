@@ -58,8 +58,8 @@ python3 patch_missions.py dreamcast .
 released mission places the base, and its model was left unfinished: 13 of its 16 turrets have
 empty firing arcs, so the game never lets them fire, and 10 of them stand upside down in the
 rock. `patch_kafelnikof.py` stands each of the 13 on the rock, turns its field of fire along the
-45th's approach or across it, in turn, and gives it a firing arc open wherever its line of fire is
-clear of the base. The three finished turrets keep their own. Its two docking ports point out of
+45th's approach or across it, in turn, and gives it a firing arc open within 45 degrees of straight
+out from the rock, where its line of fire is clear of the base. The three finished turrets keep their own. Its two docking ports point out of
 the rock, so the boarding ship docked inside it: they turn over, and the bottom vent's moves to the
 service hatch, which the mission has the wing blow for the second run to dock at. It also gives the
 cloak generator, the comms tower and the service hatch part classes, a shield generator, a comms
@@ -107,6 +107,11 @@ python3 patch_kafelnikof.py game/Kafelnikof.SHP kafelnikof.gltf .
   Diceman sends its coordinates (`uncloak_component`), and makes it the player's target and the
   primary one. The script points the player at it, but the game never lets anything aim at a
   cloaked ship.
+- `turrets13.luau`, run with mission 13, keeps the Kafelnikof's turrets from aiming at the boarding
+  ship. A turret aims at any ship not of its side, and the turrets the mod's model lets fire wore
+  down its shields as it docked, before the Basilisks the mission sends at it arrive. The turrets
+  step before the scripts in each game frame, and a turret fires at a target it picked no sooner
+  than the next, so the script drops the boarding ship from any turret that picks it.
 - `fixes17.luau`, run with mission 17, aims a friendly torpedo whose part of the Gegarin is gone at
   her hull. A torpedo goes off against whatever part it strikes, so the Cougars' first torpedoes
   can destroy the parts the later ones are aimed at, and a torpedo aimed at a part that's gone flies

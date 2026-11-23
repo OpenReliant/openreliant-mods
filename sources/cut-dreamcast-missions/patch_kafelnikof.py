@@ -20,9 +20,10 @@ each stands on the rock and has a firing arc, the directions it may fire in. The
 
 For each of those 13, the script stands the turret on the rock, its Y axis into it, and turns it
 about that axis so that its barrels face along the 45th's approach, the base's +Z, or across it,
-in turn, so that each side of the base covers both. Its arc is open in the directions where its
-line of fire is clear of the base, cast from just above it against the faces the base shows while
-it is whole, and its attack runs pull out away from the rock. The three finished turrets keep what they have.
+in turn, so that each side of the base covers both. Its arc is open in the directions within 45
+degrees of straight out from the rock where its line of fire is clear of the base, cast from just
+above it against the faces the base shows while it is whole, so that it covers only the space right
+above it. Its attack runs pull out away from the rock. The three finished turrets keep what they have.
 
 The base's two docking ports, where the boarding ship docks, point out of the rock. The boarding
 ship slides in along a port's Z axis, nose first, and stands turned as the port is, so it docked
@@ -109,6 +110,10 @@ APPROACH = (0.0, 0.0, 1.0)
 # How far above its mount a turret's line of fire starts, and how far it reaches.
 TURRET_HEIGHT = 600.0
 REACH = 200000.0
+
+# How far from straight out from the rock, in degrees, a turret may fire: a turret on the base
+# covers only the space right above it, so that the wing can fly past the base.
+ARC_CONE = 45
 
 # How many directions each turret's arc is cast in.
 SAMPLES = 1500
@@ -281,14 +286,16 @@ def directions(count):
 
 def arc(shells, place, inward):
     """The rows of the firing arc of a turret at `place` standing on the rock along `inward`: a
-    cell is open where most of the directions in it are clear of the base."""
+    cell is open where most of the directions in it are within `ARC_CONE` of straight out from the
+    rock and clear of the base."""
     origin = add(place, scale(inward, -TURRET_HEIGHT))
     clear = [[0] * 16 for _ in range(32)]
     seen = [[0] * 16 for _ in range(32)]
+    least = math.cos(math.radians(ARC_CONE))
     for d in directions(SAMPLES):
         row, column = cell(from_gltf(d))
         seen[row][column] += 1
-        if not blocked(shells, origin, d, REACH):
+        if -dot(d, inward) >= least and not blocked(shells, origin, d, REACH):
             clear[row][column] += 1
     return [sum(1 << c for c in range(16) if seen[r][c] and 2 * clear[r][c] >= seen[r][c]) for r in range(32)]
 

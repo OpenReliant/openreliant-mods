@@ -182,9 +182,11 @@ Written for the mod, for the ratings the mission can reach. The ITAC shows each 
 - **The turrets:** the base's model was left unfinished. 13 of its 16 turrets have empty firing
   arcs, so they never fire, and 10 of them stand upside down, sunk in the rock. The mod's
   `Kafelnikof.SHP` stands them on the rock, facing along
-  the 45th's approach or across it, with arcs open wherever their line of fire is clear. Firing, they
-  threaten the boarding ship as it docks, so the mod's `mission13.dte` adds them to the squad the
-  script sends the wing after to clear its way in, "(AI)Critical Kafelnikof defence".
+  the 45th's approach or across it, each firing only into the space right above it, within 45
+  degrees of straight out from the rock. The mod's `mission13.dte` adds them to the squad the script
+  sends the wing after to clear the boarding ship's way in, "(AI)Critical Kafelnikof defence", and
+  its `turrets13.luau` keeps them from aiming at the boarding ship, so that it meets the Basilisks
+  the mission sends at it with its shields up.
 - **The boarding ship's docking:** the base's two docking ports point out of the rock, so the
   boarding ship slid in from inside the rock and docked with its body sunk in it. And its second
   run docked at the bottom vent, on the far side of the base from the service hatch the wing blows
