@@ -182,7 +182,9 @@ Written for the mod, for the ratings the mission can reach. The ITAC shows each 
 - **The turrets:** the base's model was left unfinished. 13 of its 16 turrets have empty firing
   arcs, so they never fire, 10 of them stand upside down, sunk in the rock, and 3 more lie under the
   second of the base's two rocks. The mod's `Kafelnikof.SHP` stands them on the rock, facing along
-  the 45th's approach or across it, with arcs open wherever their line of fire is clear.
+  the 45th's approach or across it, with arcs open wherever their line of fire is clear. Firing, they
+  threaten the boarding ship as it docks, so the mod's `mission13.dte` adds them to the squad the
+  script sends the wing after to clear its way in, "(AI)Critical Kafelnikof defence".
 - **The cloak:** the game cloaks only the Kafelnikof's parts on its list, its machinery, and leaves
   the rest in sight. The list leaves out the turrets, so they hang in space around the hidden base,
   though their models can cloak. The mod's `kafelnikof.luau` cloaks them with the base, through the

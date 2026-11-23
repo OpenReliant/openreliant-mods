@@ -10,7 +10,7 @@ out.
 ## The missions
 
 `mission12.dte`, `mission13.dte`, `mission17.dte` and `mission22.dte` are the Dreamcast disc's, as
-they are but for 3 bytes of mission 12, 12 of mission 13 and 11 of mission 17. The disc's
+they are but for 3 bytes of mission 12, mission 13's Kurgans and squad, and 11 bytes of mission 17. The disc's
 `RESOURCE.HOG` uses the PC's archive format, so `sltool` takes them out:
 
 ```bash
@@ -42,7 +42,9 @@ Mission 13's two Kurgans start beside the Kafelnikof, either side of it, and cha
 fighters across it. Two ships that list components never collide, and the game's avoidance gives
 up once a ship is inside the other's box, which on the Kafelnikof is far larger than its rock, so
 they flew through the rock. `patch_missions.py` starts them 60000 nearer the 45th's jump-in point,
-ahead of the base.
+ahead of the base. It also adds the base's 16 turrets to the squad the script sends the wing after
+to clear the boarding ship's way in, "(AI)Critical Kafelnikof defence", beside its satellites and
+mines: the mod's model lets the turrets fire, and a squad can hold single components of a ship.
 
 The script checks each byte before it changes it:
 
