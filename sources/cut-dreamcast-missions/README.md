@@ -72,6 +72,13 @@ python3 patch_missions.py dreamcast .
 - `targets22.luau`, run with mission 22, is the mod's own help with its crowded last part: from the
   Badinov's on, each shield generator the player can hit becomes the target, and the primary
   target, in turn.
+- `kafelnikof.luau`, a load script, changes which of the Kafelnikof's parts cloak, the base of
+  mission 13 (`records.ship_types`, `cloaking_parts`). The game's list leaves out the turrets, which
+  hang in space around the hidden base, and holds the cloak generator, which the player can't
+  target while the base is cloaked, so it can't be found but by shooting the rock. Here the turrets
+  cloak, and the generator stays in sight. An OpenReliant without the list
+  ([OpenReliant#1564](https://github.com/OpenReliant/openreliant/pull/1564)) leaves the base as the
+  game has it.
 - `fixes17.luau`, run with mission 17, aims a friendly torpedo whose part of the Gegarin is gone at
   her hull. A torpedo goes off against whatever part it strikes, so the Cougars' first torpedoes
   can destroy the parts the later ones are aimed at, and a torpedo aimed at a part that's gone flies

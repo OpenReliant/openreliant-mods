@@ -172,3 +172,11 @@ Written for the mod, for the ratings the mission can reach. The ITAC shows each 
 - **Voices:** the 51 lines are voiced, and so is Enriquez's briefing, as `dreamcast_brief13`.
 - **Debriefings and briefing hologram:** OpenReliant can't yet give a mod's mission its own
   debriefings and briefing speech ([#976](https://github.com/OpenReliant/openreliant/issues/976)).
+- **The cloak:** the game cloaks only the Kafelnikof's parts on its list, its machinery, and leaves
+  the rest in sight. The list leaves out the turrets, so they hang in space around the hidden base,
+  though their models can cloak. It holds the cloak generator, which the game can't target while
+  the base is cloaked, so the script's `SetPlayerTarget` on it does nothing and the player has no
+  way to find it but to shoot the rock. The mod's `kafelnikof.luau` cloaks the turrets with the base
+  and leaves the generator in sight, through the ship type's `cloaking_parts`
+  ([OpenReliant#1564](https://github.com/OpenReliant/openreliant/pull/1564)). The Dreamcast's model of the Kafelnikof has the same parts, the same docking
+  points and the same turrets as the PC's.
