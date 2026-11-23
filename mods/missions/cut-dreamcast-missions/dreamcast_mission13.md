@@ -180,9 +180,12 @@ Written for the mod, for the ratings the mission can reach. The ITAC shows each 
   the 45th's approach or across it, with arcs open wherever their line of fire is clear.
 - **The cloak:** the game cloaks only the Kafelnikof's parts on its list, its machinery, and leaves
   the rest in sight. The list leaves out the turrets, so they hang in space around the hidden base,
-  though their models can cloak. It holds the cloak generator, which the game can't target while
-  the base is cloaked, so the script's `SetPlayerTarget` on it does nothing and the player has no
-  way to find it but to shoot the rock. The mod's `kafelnikof.luau` cloaks the turrets with the base
-  and leaves the generator in sight, through the ship type's `cloaking_parts`
-  ([OpenReliant#1564](https://github.com/OpenReliant/openreliant/pull/1564)). The Dreamcast's model of the Kafelnikof has the same parts, the same docking
-  points and the same turrets as the PC's.
+  though their models can cloak. The mod's `kafelnikof.luau` cloaks them with the base, through the
+  ship type's `cloaking_parts`
+  ([OpenReliant#1564](https://github.com/OpenReliant/openreliant/pull/1564)).
+- **The cloak generator:** the script points the player at it once Diceman finds it, but the game
+  never lets anything aim at a cloaked ship, so the player could only find it by shooting the rock.
+  The mod's `generator13.luau` brings it out of the cloak as Diceman sends its coordinates, and
+  makes it the player's target (`uncloak_component`,
+  [OpenReliant#1567](https://github.com/OpenReliant/openreliant/pull/1567)). The Dreamcast's model of
+  the Kafelnikof has the same parts, docking points and turrets as the PC's.
