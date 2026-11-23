@@ -174,6 +174,10 @@ Written for the mod, for the ratings the mission can reach. The ITAC shows each 
 - **Voices:** the 51 lines are voiced, and so is Enriquez's briefing, as `dreamcast_brief13`.
 - **Debriefings and briefing hologram:** OpenReliant can't yet give a mod's mission its own
   debriefings and briefing speech ([#976](https://github.com/OpenReliant/openreliant/issues/976)).
+- **The turrets:** the base's model was left unfinished. 13 of its 16 turrets have empty firing
+  arcs, so they never fire, 10 of them stand upside down, sunk in the rock, and 3 more lie under the
+  second of the base's two rocks. The mod's `Kafelnikof.SHP` stands them on the rock, facing along
+  the 45th's approach or across it, with arcs open wherever their line of fire is clear.
 - **The cloak:** the game cloaks only the Kafelnikof's parts on its list, its machinery, and leaves
   the rest in sight. The list leaves out the turrets, so they hang in space around the hidden base,
   though their models can cloak. It holds the cloak generator, which the game can't target while

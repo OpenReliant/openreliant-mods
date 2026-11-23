@@ -44,6 +44,22 @@ The script checks each byte before it changes it:
 python3 patch_missions.py dreamcast .
 ```
 
+## The Kafelnikof
+
+`Kafelnikof.SHP` is the game's model of the base of mission 13, with its turrets finished. No
+released mission places the base, and its model was left unfinished: 13 of its 16 turrets have
+empty firing arcs, so the game never lets them fire, 10 of them stand upside down in the rock, and
+3 more lie under the second of the base's two overlapping rocks. `patch_kafelnikof.py` stands each
+of the 13 on the outermost rock, turns its field of fire along the 45th's approach or across it,
+in turn, and gives it a firing arc open wherever its line of fire is clear of the base. The three
+finished turrets keep their own. It reads the game's model and `sltool`'s export of it:
+
+```bash
+sltool hog extract resource.hog game
+sltool shp gltf game/Kafelnikof.SHP kafelnikof.gltf
+python3 patch_kafelnikof.py game/Kafelnikof.SHP kafelnikof.gltf .
+```
+
 ## The scripts
 
 - `campaign.luau`, a load script, puts the four missions into the campaign's order
