@@ -100,14 +100,11 @@ python3 patch_kafelnikof.py game/Kafelnikof.SHP kafelnikof.gltf .
   target, in turn.
 - `kafelnikof.luau`, a load script, adds the turrets to the Kafelnikof's parts that cloak, the base
   of mission 13 (`records.ship_types`, `cloaking_parts`). The game's list leaves them out, so they
-  hang in space around the hidden base. An OpenReliant without the list
-  ([OpenReliant#1564](https://github.com/OpenReliant/openreliant/pull/1564)) leaves the base as the
-  game has it.
+  hang in space around the hidden base.
 - `generator13.luau`, run with mission 13, brings the base's cloak generator out of the cloak as
-  Diceman sends its coordinates, and makes it the player's target and the primary one. The script
-  points the player at it, but the game never lets anything aim at a cloaked ship. An OpenReliant
-  without `uncloak_component` ([OpenReliant#1567](https://github.com/OpenReliant/openreliant/pull/1567))
-  leaves it as the game has it.
+  Diceman sends its coordinates (`uncloak_component`), and makes it the player's target and the
+  primary one. The script points the player at it, but the game never lets anything aim at a
+  cloaked ship.
 - `fixes17.luau`, run with mission 17, aims a friendly torpedo whose part of the Gegarin is gone at
   her hull. A torpedo goes off against whatever part it strikes, so the Cougars' first torpedoes
   can destroy the parts the later ones are aimed at, and a torpedo aimed at a part that's gone flies

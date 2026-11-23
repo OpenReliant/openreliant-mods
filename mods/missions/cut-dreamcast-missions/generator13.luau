@@ -5,9 +5,6 @@
 -- anything aim at a cloaked ship, so the player could only find it by shooting the rock. Here, as
 -- Diceman sends the coordinates, the generator comes out of the cloak and becomes the player's
 -- target and the primary one.
---
--- An OpenReliant without `uncloak_component` (OpenReliant#1567) leaves the generator as the game
--- has it.
 local hooks = require("openreliant.hooks")
 local world = require("openreliant.world")
 
@@ -32,11 +29,7 @@ hooks.add("radio_say", function(e)
     if not kafelnikof then
         return
     end
-    local found = pcall(function()
-        kafelnikof:uncloak_component(GENERATOR)
-    end)
-    if found then
-        world.set_primary_target(kafelnikof, GENERATOR)
-        world.set_player_target(kafelnikof, GENERATOR)
-    end
+    kafelnikof:uncloak_component(GENERATOR)
+    world.set_primary_target(kafelnikof, GENERATOR)
+    world.set_player_target(kafelnikof, GENERATOR)
 end)
