@@ -18,12 +18,19 @@ each stands on the rock and has a firing arc, the directions it may fire in. The
 - their arcs are empty, so the game never lets them fire;
 - and the fighters' attack runs on them pull out along no direction.
 
-For each of those 13, the script stands the turret on the rock, its Y axis into it, moves it out
-onto the outermost of the base's two rocks where the other covers it (the first three on the
-body's rock lie under the other), and turns it about that axis so that its barrels face along the 45th's approach, the base's +Z, or across it,
+For each of those 13, the script stands the turret on the rock, its Y axis into it, and turns it
+about that axis so that its barrels face along the 45th's approach, the base's +Z, or across it,
 in turn, so that each side of the base covers both. Its arc is open in the directions where its
-line of fire is clear of the base, cast from just above it against the base's own faces, and its
-attack runs pull out away from the rock. The three finished turrets keep what they have.
+line of fire is clear of the base, cast from just above it against the faces the base shows while
+it is whole, and its attack runs pull out away from the rock. The three finished turrets keep what they have.
+
+The base's two docking ports, where the boarding ship docks, point out of the rock. The boarding
+ship slides in along a port's Z axis, nose first, and stands turned as the port is, so it docked
+with its body sunk in the rock. Each port turns over, its Z axis into the rock. The second run
+docks at the first port, on the bottom vent, though the mission has the wing blow the service
+hatch, the top vent, for it, and the top vent has no port. A port on the hatch would go with it, so
+the bottom vent's port moves to the hatch instead: the hatch is sunk in the rock, so the port
+stands where the line out across the hatch's faces leaves the rock, its Z axis back down it. The bottom vent stays whole in the mission, so its port stays.
 
 The machinery the mission points the player at has no part class, so the target display shows no
 name or icon for it. The cloak generator, "Kaf shield gen", becomes a shield generator, the comms
@@ -51,8 +58,24 @@ POSITION = 0x04
 ORIENTATION = 0x10
 GUN = 1
 
-# A part record: its name, 64 bytes, then its class.
+# The docking ports, attachments of kind 9, by their positions on their parts as whole numbers: the
+# bottom vent's, which moves to the hatch, and the landing platform's.
+DOCK = 9
+BOTTOM_VENT_PORT = (148, -1796, 116)
+LANDING_PORT = (708, -3067, -3629)
+HATCH = 'Kaf top vent'
+# How finely the way out of the rock over the hatch is measured.
+HATCH_STEP = 50
+BOTTOM_VENT = 'Kaf bot vent'
+
+# The parts' chunk: its tag, record size and count. A part record holds its name, 64 bytes, then
+# its class, and its flags, of which one marks a damaged model, hidden while its part is whole.
+PARTS = 23
+PART_SIZE = 312
+PART_CHUNK = struct.pack('<3H', 0x01, PART_SIZE, PARTS)
 PART_CLASS = 0x40
+PART_FLAGS = 0xF0
+DAMAGED = 0x04
 # The classes the machinery takes (`shp.Part.Class`), by its parts' names.
 CLASSES = (("Kaf shield gen", 6), ("Kaf comms twr", 7), ("Kaf top vent", 17))
 
@@ -82,9 +105,6 @@ FINISHED = {7, 12, 13}
 
 # Where the 45th comes from, in the model's frame as glTF has it.
 APPROACH = (0.0, 0.0, 1.0)
-
-# How far a turret moved out onto the outermost rock stands in it.
-SINK = 50.0
 
 # How far above its mount a turret's line of fire starts, and how far it reaches.
 TURRET_HEIGHT = 600.0
@@ -145,9 +165,10 @@ def axes_from_gltf(x, y, z):
 
 # --- The geometry ----------------------------------------------------------------------------------
 
-def shells_and_mounts(path):
-    """The base's faces, a list for each part, and each turret mount's part's place, its own place and its
-    Y axis, in the model's frame as glTF has it."""
+def shells_and_mounts(path, drawn):
+    """The faces of the base's parts named in `drawn`, a list for each; each turret mount's part's
+    place, its own place and its Y axis; and those parts' places and faces by their names; in the
+    model's frame as glTF has it."""
     gltf = json.load(open(path))
     folder = os.path.dirname(path)
     buffers = [open(os.path.join(folder, b['uri']), 'rb').read() for b in gltf['buffers']]
@@ -163,17 +184,18 @@ def shells_and_mounts(path):
         return [struct.unpack_from('<' + code * width, data, start + k * stride) for k in range(a['count'])]
 
     nodes = gltf['nodes']
-    shells, mounts = [], []
+    shells, mounts, parts = [], [], {}
     for node in nodes:
         name = node.get('name', '')
         at = tuple(node.get('translation', (0, 0, 0)))
-        if 'mesh' in node and (name.startswith('Kaf') or name == 'Line01') and not name.endswith(('CLOKD', 'DEST')):
+        if 'mesh' in node and name in drawn:
             shell = []
             for primitive in gltf['meshes'][node['mesh']]['primitives']:
                 points = [add(at, p) for p in accessor(primitive['attributes']['POSITION'])]
                 order = [i[0] for i in accessor(primitive['indices'])] if 'indices' in primitive else list(range(len(points)))
                 shell += [(points[order[k]], points[order[k + 1]], points[order[k + 2]]) for k in range(0, len(order), 3)]
             shells.append(shell)
+            parts[name] = (at, shell)
         for child in node.get('children', []):
             mount = nodes[child]
             if mount.get('name', '').startswith('gun'):
@@ -181,7 +203,7 @@ def shells_and_mounts(path):
                 mounts.append((at, place, turn(mount.get('rotation', (0, 0, 0, 1)), (0, 1, 0))))
     if len(mounts) != len(MOUNTS):
         sys.exit(f'the glTF file has {len(mounts)} turret mounts, not {len(MOUNTS)}')
-    return shells, mounts
+    return shells, mounts, parts
 
 
 def crossings(faces, origin, direction, reach):
@@ -228,21 +250,14 @@ def inside(shells, point):
 # --- The turrets -----------------------------------------------------------------------------------
 
 def standing(shells, place, y, across):
-    """Where a turret mounted at `place`, its old Y axis `y`, stands, and its axes: on the outermost
-    rock, Y into it, and the barrels along the approach, or `across` it. Each in the model's frame
-    as glTF has it."""
+    """The axes of a turret mounted at `place`, its old Y axis `y`: Y into the rock, and the barrels
+    along the approach, or `across` it. Each in the model's frame as glTF has it."""
     inward = scale(y, -1) if inside(shells, add(place, scale(y, -TURRET_HEIGHT))) else y
-    outward = scale(inward, -1)
-    if inside(shells, add(place, scale(outward, TURRET_HEIGHT))):
-        for t in sorted(t for shell in shells for t in distances(shell, place, outward, REACH)):
-            if not inside(shells, add(place, scale(outward, t + SINK))):
-                place = add(place, scale(outward, t - SINK))
-                break
     along = sub(APPROACH, scale(inward, dot(APPROACH, inward)))
     along = unit(along) if dot(along, along) > 1e-6 else (1.0, 0.0, 0.0)
     barrels = unit(cross(inward, along)) if across else along
     z = scale(barrels, -1)
-    return place, (cross(inward, z), inward, z)
+    return cross(inward, z), inward, z
 
 
 def cell(w):
@@ -280,9 +295,9 @@ def arc(shells, place, inward):
 
 # --- The file --------------------------------------------------------------------------------------
 
-def position_at(data, at):
-    """The position of an attachment of kind `GUN` at `at`, as whole numbers, or None."""
-    if struct.unpack_from('<I', data, at + KIND)[0] != GUN:
+def position_at(data, at, kind=GUN):
+    """The position of an attachment of kind `kind` at `at`, as whole numbers, or None."""
+    if struct.unpack_from('<I', data, at + KIND)[0] != kind:
         return None
     values = struct.unpack_from('<3f', data, at + POSITION)
     if not all(math.isfinite(v) for v in values):
@@ -290,16 +305,66 @@ def position_at(data, at):
     return tuple(round(v) for v in values)
 
 
-def find_mounts(data):
-    """The offset of each mount's record, in the order of `MOUNTS`. The file's chunks follow one
+def find_attachment(data, position, kind):
+    """The offset of the one attachment of kind `kind` at `position`. The file's chunks follow one
     another unaligned, so every byte is a place to look."""
-    found = []
-    for position in MOUNTS:
-        places = [at for at in range(len(data) - ORIENTATION - 36) if position_at(data, at) == position]
-        if len(places) != 1:
-            sys.exit(f'the turret mount at {position} is in the file {len(places)} times, not once')
-        found.append(places[0])
-    return found
+    places = [at for at in range(len(data) - ORIENTATION - 36) if position_at(data, at, kind) == position]
+    if len(places) != 1:
+        sys.exit(f'the attachment at {position} is in the file {len(places)} times, not once')
+    return places[0]
+
+
+def find_mounts(data):
+    """The offset of each mount's record, in the order of `MOUNTS`."""
+    return [find_attachment(data, position, GUN) for position in MOUNTS]
+
+
+def turn_port_over(data, at):
+    """A half turn of the port at `at` about its own X axis: its Y and Z axes, the last two columns
+    of its axes, point the other way."""
+    axes = list(struct.unpack_from('<9f', data, at + ORIENTATION))
+    for column in (1, 2):
+        for row in range(3):
+            axes[row * 3 + column] = -axes[row * 3 + column]
+    struct.pack_into('<9f', data, at + ORIENTATION, *axes)
+
+
+def sum_of(vectors):
+    total = (0.0, 0.0, 0.0)
+    for v in vectors:
+        total = add(total, v)
+    return total
+
+
+def hatch_port(shells, parts):
+    """Where the hatch's port stands, and its axes: over the middle of the hatch, where its line
+    across the hatch's faces comes out of the rock, the hatch being sunk in it, and its Z axis back
+    down that line. Each in the model's frame as glTF has it."""
+    _, faces = parts[HATCH]
+    corners = [corner for face in faces for corner in face]
+    middle = scale(sum_of(corners), 1 / len(corners))
+    across = unit(sum_of([cross(sub(b, a), sub(c, a)) for a, b, c in faces]))
+    rock = [shell for shell in shells if shell is not faces]
+    reach = {}
+    for way in (across, scale(across, -1)):
+        reach[way] = next((t for t in range(0, int(REACH), HATCH_STEP) if not inside(rock, add(middle, scale(way, t)))), None)
+    out = min((way for way in reach if reach[way] is not None), key=lambda way: reach[way])
+    middle = add(middle, scale(out, reach[out]))
+    z = scale(out, -1)
+    across = (1.0, 0.0, 0.0) if abs(z[0]) < 0.9 else (0.0, 1.0, 0.0)
+    y = unit(cross(z, across))
+    return middle, (cross(y, z), y, z)
+
+
+def move_ports(data, shells, parts):
+    """Turns the landing platform's port over, and moves the bottom vent's to the hatch."""
+    turn_port_over(data, find_attachment(data, LANDING_PORT, DOCK))
+    record = find_attachment(data, BOTTOM_VENT_PORT, DOCK)
+    place, (x, y, z) = hatch_port(shells, parts)
+    vent, _ = parts[BOTTOM_VENT]
+    axes = axes_from_gltf(x, y, z)
+    struct.pack_into('<3f', data, record + POSITION, *from_gltf(sub(place, vent)))
+    struct.pack_into('<9f', data, record + ORIENTATION, *(axes[c][r] for r in range(3) for c in range(3)))
 
 
 def find_arcs(data):
@@ -308,6 +373,22 @@ def find_arcs(data):
     if at < 0 or data.find(ARC_CHUNK, at + 1) >= 0:
         sys.exit('the firing arcs are not in the file once')
     return at + len(ARC_CHUNK)
+
+
+def drawn_parts(data):
+    """The names of the parts drawn while the base is whole: those without the flag of a damaged
+    model (`shp.Part.Flags.damaged`), such as the body's damaged model, Line01, and the
+    machinery's DEST parts."""
+    start = data.find(PART_CHUNK)
+    if start < 0 or data.find(PART_CHUNK, start + 1) >= 0:
+        sys.exit('the parts are not in the file once')
+    names = set()
+    for number in range(PARTS):
+        at = start + len(PART_CHUNK) + number * PART_SIZE
+        name = bytes(data[at:at + 64]).split(b'\0')[0].decode('latin1')
+        if not struct.unpack_from('<I', data, at + PART_FLAGS)[0] & DAMAGED:
+            names.add(name)
+    return names
 
 
 def give_classes(data):
@@ -329,20 +410,20 @@ def main():
     data = bytearray(open(source, 'rb').read())
     if hashlib.sha256(data).hexdigest() != SHA256:
         sys.exit(f'{source} is not the game\'s Kafelnikof.SHP')
-    shells, mounts = shells_and_mounts(exported)
+    shells, mounts, parts = shells_and_mounts(exported, drawn_parts(data))
     arcs = find_arcs(data)
     unfinished = 0
     for number, ((part, place, y), record) in enumerate(zip(mounts, find_mounts(data))):
         if number in FINISHED:
             continue
-        place, (x, inward, z) = standing(shells, place, y, unfinished % 2 == 1)
+        x, inward, z = standing(shells, place, y, unfinished % 2 == 1)
         unfinished += 1
         axes = axes_from_gltf(x, inward, z)
-        struct.pack_into('<3f', data, record + POSITION, *from_gltf(sub(place, part)))
         struct.pack_into('<9f', data, record + ORIENTATION, *(axes[c][r] for r in range(3) for c in range(3)))
         component = arcs + (FIRST_TURRET + number) * ARC_SIZE
         struct.pack_into('<3f', data, component, *from_gltf(scale(inward, -1)))
         struct.pack_into('<32H', data, component + ARC_ROWS, *arc(shells, place, inward))
+    move_ports(data, shells, parts)
     give_classes(data)
     os.makedirs(out, exist_ok=True)
     with open(os.path.join(out, 'Kafelnikof.SHP'), 'wb') as file:

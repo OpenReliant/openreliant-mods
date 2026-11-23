@@ -56,13 +56,15 @@ python3 patch_missions.py dreamcast .
 
 `Kafelnikof.SHP` is the game's model of the base of mission 13, with its turrets finished. No
 released mission places the base, and its model was left unfinished: 13 of its 16 turrets have
-empty firing arcs, so the game never lets them fire, 10 of them stand upside down in the rock, and
-3 more lie under the second of the base's two overlapping rocks. `patch_kafelnikof.py` stands each
-of the 13 on the outermost rock, turns its field of fire along the 45th's approach or across it,
-in turn, and gives it a firing arc open wherever its line of fire is clear of the base. The three
-finished turrets keep their own. It also gives the cloak generator, the comms tower and the service hatch
-part classes, a shield generator, a comms transmitter and a vent hatch, so that the target display
-names them. It reads the game's model and `sltool`'s export of it:
+empty firing arcs, so the game never lets them fire, and 10 of them stand upside down in the
+rock. `patch_kafelnikof.py` stands each of the 13 on the rock, turns its field of fire along the
+45th's approach or across it, in turn, and gives it a firing arc open wherever its line of fire is
+clear of the base. The three finished turrets keep their own. Its two docking ports point out of
+the rock, so the boarding ship docked inside it: they turn over, and the bottom vent's moves to the
+service hatch, which the mission has the wing blow for the second run to dock at. It also gives the
+cloak generator, the comms tower and the service hatch part classes, a shield generator, a comms
+transmitter and a vent hatch, so that the target display names them. Its geometry counts only the
+parts drawn while the base is whole: `Line01`, the body's damaged model, stays hidden till then. It reads the game's model and `sltool`'s export of it:
 
 ```bash
 sltool hog extract resource.hog game

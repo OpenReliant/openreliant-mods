@@ -180,11 +180,17 @@ Written for the mod, for the ratings the mission can reach. The ITAC shows each 
   The mod's `mission13.dte` starts them 60000 nearer the 45th's jump-in point, ahead of the base
   (`patch_missions.py`).
 - **The turrets:** the base's model was left unfinished. 13 of its 16 turrets have empty firing
-  arcs, so they never fire, 10 of them stand upside down, sunk in the rock, and 3 more lie under the
-  second of the base's two rocks. The mod's `Kafelnikof.SHP` stands them on the rock, facing along
+  arcs, so they never fire, and 10 of them stand upside down, sunk in the rock. The mod's
+  `Kafelnikof.SHP` stands them on the rock, facing along
   the 45th's approach or across it, with arcs open wherever their line of fire is clear. Firing, they
   threaten the boarding ship as it docks, so the mod's `mission13.dte` adds them to the squad the
   script sends the wing after to clear its way in, "(AI)Critical Kafelnikof defence".
+- **The boarding ship's docking:** the base's two docking ports point out of the rock, so the
+  boarding ship slid in from inside the rock and docked with its body sunk in it. And its second
+  run docked at the bottom vent, on the far side of the base from the service hatch the wing blows
+  for it. The mod's model turns both ports over and moves the bottom vent's port to the hatch, at
+  the mouth of the hole it leaves, and the mod's `mission13.dte` moves the waypoint the wing
+  escorts that run to, "Limpet Dock Point 2", over the hatch.
 - **The machinery's names:** the base's parts have no class, so the target display named none of
   them. The mod's model makes the cloak generator a shield generator, the nearest class the game
   names, the comms tower a comms transmitter and the service hatch a vent hatch. A shield

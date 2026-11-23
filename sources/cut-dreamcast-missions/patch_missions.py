@@ -48,7 +48,9 @@ Mission 13: the two Kurgans that patrol the Kafelnikof start beside the base, ei
 As they attack the 45th, they chase its fighters across the base, and the game's avoidance gives
 up once a ship is inside the base's box, which is far larger than its rock: two ships that list
 components never collide, so the Kurgans flew through the rock. They start 60000 nearer the
-45th's jump-in point instead, ahead of the base, where they meet the wing on its way in.
+45th's jump-in point instead, ahead of the base, where they meet the wing on its way in. The waypoint the wing escorts the
+boarding ship's second run to moves to the service hatch, where the mod's model has the port that
+run docks at.
 
 Mission 13 also sends the wing after the squad "(AI)Critical Kafelnikof defence", the satellites
 and mines round the boarding ship's way in, but not the base's 16 turrets, which the mod's model
@@ -86,11 +88,15 @@ MISSION17_PUSHES = (
 )
 MISSION17_WAITS = (5043,)
 
-# Mission 13: the Kurgans' records, by the place of their positions in the file: the position the
+# Mission 13: the Kurgans' and a waypoint's records, by the place of their positions in the file: the position the
 # mission gives, and the copy the loader keeps, 0x14 bytes before it; and where each starts.
 MISSION13_SHIP_POSITIONS = (
     (0x32D2B, (-72533.328125, 0.0, 98055.7578125), (-72533.328125, 0.0, 38055.7578125)),
     (0x32D77, (58466.66015625, 0.0, 98578.53125), (58466.66015625, 0.0, 38578.53125)),
+    # "Limpet Dock Point 2", where the wing escorts the boarding ship's second run: over the
+    # service hatch, where the mod's Kafelnikof has the port it docks at (`patch_kafelnikof.py`),
+    # rather than over the bottom vent.
+    (0x3357B, (5290.1875, 19731.9609375, 109207.015625), (11709.85, -26249.21, 95252.07)),
 )
 LOADER_COPY = -0x14
 
