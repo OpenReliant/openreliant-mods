@@ -185,6 +185,11 @@ Written for the mod, for the ratings the mission can reach. The ITAC shows each 
   the 45th's approach or across it, with arcs open wherever their line of fire is clear. Firing, they
   threaten the boarding ship as it docks, so the mod's `mission13.dte` adds them to the squad the
   script sends the wing after to clear its way in, "(AI)Critical Kafelnikof defence".
+- **The machinery's names:** the base's parts have no class, so the target display named none of
+  them. The mod's model makes the cloak generator a shield generator, the nearest class the game
+  names, the comms tower a comms transmitter and the service hatch a vent hatch. A shield
+  generator brings the game's rules for one: while it stands, a light hit on the base does a
+  quarter of its damage.
 - **The cloak:** the game cloaks only the Kafelnikof's parts on its list, its machinery, and leaves
   the rest in sight. The list leaves out the turrets, so they hang in space around the hidden base,
   though their models can cloak. The mod's `kafelnikof.luau` cloaks them with the base, through the

@@ -25,6 +25,12 @@ in turn, so that each side of the base covers both. Its arc is open in the direc
 line of fire is clear of the base, cast from just above it against the base's own faces, and its
 attack runs pull out away from the rock. The three finished turrets keep what they have.
 
+The machinery the mission points the player at has no part class, so the target display shows no
+name or icon for it. The cloak generator, "Kaf shield gen", becomes a shield generator, the comms
+tower a comms transmitter, and the top vent, the service hatch, a vent hatch. A shield generator
+brings the game's rules for one: while it stands, a light hit on the base does a quarter of its
+damage, and a hit on a component flares the base's shield.
+
 The script checks the game's file's SHA-256 first, so it refuses any other file.
 """
 import hashlib
@@ -44,6 +50,11 @@ KIND = 0x00
 POSITION = 0x04
 ORIENTATION = 0x10
 GUN = 1
+
+# A part record: its name, 64 bytes, then its class.
+PART_CLASS = 0x40
+# The classes the machinery takes (`shp.Part.Class`), by its parts' names.
+CLASSES = (("Kaf shield gen", 6), ("Kaf comms twr", 7), ("Kaf top vent", 17))
 
 # The firing arcs' chunk: its tag, record size and count, then a record for each component: the
 # way an attack run pulls out, then 32 rows of 16 bits.
@@ -299,6 +310,18 @@ def find_arcs(data):
     return at + len(ARC_CHUNK)
 
 
+def give_classes(data):
+    """Gives the machinery the mission points the player at its classes (`CLASSES`)."""
+    for name, part_class in CLASSES:
+        key = name.encode() + b'\0'
+        at = data.find(key)
+        if at < 0 or data.find(key, at + 1) >= 0:
+            sys.exit(f'the part {name} is not in the file once')
+        if struct.unpack_from('<I', data, at + PART_CLASS)[0] != 0:
+            sys.exit(f'the part {name} already has a class')
+        struct.pack_into('<I', data, at + PART_CLASS, part_class)
+
+
 def main():
     if len(sys.argv) != 4:
         sys.exit(__doc__)
@@ -320,6 +343,7 @@ def main():
         component = arcs + (FIRST_TURRET + number) * ARC_SIZE
         struct.pack_into('<3f', data, component, *from_gltf(scale(inward, -1)))
         struct.pack_into('<32H', data, component + ARC_ROWS, *arc(shells, place, inward))
+    give_classes(data)
     os.makedirs(out, exist_ok=True)
     with open(os.path.join(out, 'Kafelnikof.SHP'), 'wb') as file:
         file.write(data)

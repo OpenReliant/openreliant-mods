@@ -60,7 +60,9 @@ empty firing arcs, so the game never lets them fire, 10 of them stand upside dow
 3 more lie under the second of the base's two overlapping rocks. `patch_kafelnikof.py` stands each
 of the 13 on the outermost rock, turns its field of fire along the 45th's approach or across it,
 in turn, and gives it a firing arc open wherever its line of fire is clear of the base. The three
-finished turrets keep their own. It reads the game's model and `sltool`'s export of it:
+finished turrets keep their own. It also gives the cloak generator, the comms tower and the service hatch
+part classes, a shield generator, a comms transmitter and a vent hatch, so that the target display
+names them. It reads the game's model and `sltool`'s export of it:
 
 ```bash
 sltool hog extract resource.hog game
