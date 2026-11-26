@@ -168,7 +168,50 @@ Written for the mod, for the ratings the mission can reach. The ITAC shows each 
 - **Faces:** the mission's comms give the wrong faces. The mod sets the speaking ships' pilots as
   the mission starts (the wing leader's Patriot to Bandit, the Tempest to Diceman, the boarding ship
   to the Marine leader, whose face and voice mission 11's boarding ship has), and maps the pilot
-  numbers its comms commands use: 103 to Stahl, 102 to Moose.
+  numbers its comms commands use: 103 to Stahl, 102 to Moose. The base's gun and missile satellites fly with no
+  pilot. Without one in the file, the game gives a hostile ship a fighter pilot's, whose voice
+  would taunt the player each time a satellite's shot strikes.
 - **Voices:** the 51 lines are voiced, and so is Enriquez's briefing, as `dreamcast_brief13`.
 - **Debriefings and briefing hologram:** OpenReliant can't yet give a mod's mission its own
   debriefings and briefing speech ([#976](https://github.com/OpenReliant/openreliant/issues/976)).
+- **The Kurgans:** they start beside the base, either side of it, and chased the 45th's fighters
+  across it. Two ships that list components never collide, and the game's avoidance gives up once a
+  ship is inside the base's box, which is far larger than its rock, so they flew through the rock.
+  The mod's `mission13.dte` starts them 60000 nearer the 45th's jump-in point, ahead of the base
+  (`patch_missions.py`).
+- **The turrets:** the base's model was left unfinished. 13 of its 16 turrets have empty firing
+  arcs, so they never fire, and 10 of them stand upside down, sunk in the rock. The mod's
+  `Kafelnikof.SHP` stands them on the rock, facing along
+  the 45th's approach or across it, each firing only into the space right above it, within 45
+  degrees of straight out from the rock. The mod's `mission13.dte` adds them to the squad the script
+  sends the wing after to clear the boarding ship's way in, "(AI)Critical Kafelnikof defence", and
+  its `turrets13.luau` keeps them from aiming at the boarding ship, so that it meets the Basilisks
+  the mission sends at it with its shields up. The game also lets a cloaked ship's turrets fire, so
+  `turrets13.luau` disables the base's guns while it is cloaked.
+- **The boarding ship's docking:** the base's two docking ports point out of the rock, so the
+  boarding ship slid in from inside the rock and docked with its body sunk in it. And its second
+  run docked at the bottom vent, on the far side of the base from the service hatch the wing blows
+  for it. The mod's model turns both ports over and moves the bottom vent's port to the hatch, at
+  the mouth of the hole it leaves, and the mod's `mission13.dte` moves the waypoint the wing
+  escorts that run to, "Limpet Dock Point 2", over the hatch.
+- **The boarding ship holding off:** after each drop-off and pickup the script sends the boarding
+  ship to wait far from the base, and the Basilisks it sends at the wing and the boarding ship
+  hunt it there, destroying it within seconds. In the cut data it docked inside the rock, which
+  likely shielded it. The mod's `boarding13.luau` makes it invulnerable while it holds off; on its
+  runs to and from the base the wing still has to protect it.
+- **The machinery's names:** the base's parts have no class, so the target display named none of
+  them. The mod's model makes the cloak generator a shield generator, the nearest class the game
+  names, the comms tower a comms transmitter and the service hatch a vent hatch. A shield
+  generator brings the game's rules for one: while it stands, a light hit on the base does a
+  quarter of its damage.
+- **The cloak:** the game cloaks only the Kafelnikof's parts on its list, its machinery, and leaves
+  the rest in sight. The list leaves out the turrets, so they hang in space around the hidden base,
+  though their models can cloak. The mod's `kafelnikof.luau` cloaks them with the base, through the
+  ship type's `cloaking_parts`
+  ([OpenReliant#1564](https://github.com/OpenReliant/openreliant/pull/1564)).
+- **The cloak generator:** the script points the player at it once Diceman finds it, but the game
+  never lets anything aim at a cloaked ship, so the player could only find it by shooting the rock.
+  The mod's `generator13.luau` brings it out of the cloak as Diceman sends its coordinates, and
+  makes it the player's target (`uncloak_component`,
+  [OpenReliant#1567](https://github.com/OpenReliant/openreliant/pull/1567)). The Dreamcast's model of
+  the Kafelnikof has the same parts, docking points and turrets as the PC's.

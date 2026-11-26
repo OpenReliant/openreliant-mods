@@ -10,8 +10,8 @@ out.
 ## The missions
 
 `mission12.dte`, `mission13.dte`, `mission17.dte` and `mission22.dte` are the Dreamcast disc's, as
-they are but for 3 bytes of mission 12 and 11 of mission 17. The disc's `RESOURCE.HOG` uses the PC's archive format, so
-`sltool` takes them out:
+they are but for 3 bytes of mission 12, mission 13's Kurgans and squad, and 11 bytes of mission 17. The disc's
+`RESOURCE.HOG` uses the PC's archive format, so `sltool` takes them out:
 
 ```bash
 sltool hog extract RESOURCE.HOG dreamcast
@@ -38,10 +38,38 @@ destroy her. The original game runs the script the same way. `patch_missions.py`
 `MultiPlayerSync` in place of each of these waits, which outside a network game yields once and
 lets the thread go on.
 
+Mission 13's two Kurgans start beside the Kafelnikof, either side of it, and chase the 45th's
+fighters across it. Two ships that list components never collide, and the game's avoidance gives
+up once a ship is inside the other's box, which on the Kafelnikof is far larger than its rock, so
+they flew through the rock. `patch_missions.py` starts them 60000 nearer the 45th's jump-in point,
+ahead of the base. It also adds the base's 16 turrets to the squad the script sends the wing after
+to clear the boarding ship's way in, "(AI)Critical Kafelnikof defence", beside its satellites and
+mines: the mod's model lets the turrets fire, and a squad can hold single components of a ship.
+
 The script checks each byte before it changes it:
 
 ```bash
 python3 patch_missions.py dreamcast .
+```
+
+## The Kafelnikof
+
+`Kafelnikof.SHP` is the game's model of the base of mission 13, with its turrets finished. No
+released mission places the base, and its model was left unfinished: 13 of its 16 turrets have
+empty firing arcs, so the game never lets them fire, and 10 of them stand upside down in the
+rock. `patch_kafelnikof.py` stands each of the 13 on the rock, turns its field of fire along the
+45th's approach or across it, in turn, and gives it a firing arc open within 45 degrees of straight
+out from the rock, where its line of fire is clear of the base. The three finished turrets keep their own. Its two docking ports point out of
+the rock, so the boarding ship docked inside it: they turn over, and the bottom vent's moves to the
+service hatch, which the mission has the wing blow for the second run to dock at. It also gives the
+cloak generator, the comms tower and the service hatch part classes, a shield generator, a comms
+transmitter and a vent hatch, so that the target display names them. Its geometry counts only the
+parts drawn while the base is whole: `Line01`, the body's damaged model, stays hidden till then. It reads the game's model and `sltool`'s export of it:
+
+```bash
+sltool hog extract resource.hog game
+sltool shp gltf game/Kafelnikof.SHP kafelnikof.gltf
+python3 patch_kafelnikof.py game/Kafelnikof.SHP kafelnikof.gltf .
 ```
 
 ## The scripts
@@ -72,6 +100,26 @@ python3 patch_missions.py dreamcast .
 - `targets22.luau`, run with mission 22, is the mod's own help with its crowded last part: from the
   Badinov's on, each shield generator the player can hit becomes the target, and the primary
   target, in turn.
+- `kafelnikof.luau`, a load script, adds the turrets to the Kafelnikof's parts that cloak, the base
+  of mission 13 (`records.ship_types`, `cloaking_parts`). The game's list leaves them out, so they
+  hang in space around the hidden base.
+- `generator13.luau`, run with mission 13, brings the base's cloak generator out of the cloak as
+  Diceman sends its coordinates (`uncloak_component`), and makes it the player's target and the
+  primary one. The script points the player at it, but the game never lets anything aim at a
+  cloaked ship.
+- `turrets13.luau`, run with mission 13, keeps the Kafelnikof's turrets from aiming at the boarding
+  ship. A turret aims at any ship not of its side, and the turrets the mod's model lets fire wore
+  down its shields as it docked, before the Basilisks the mission sends at it arrive. The turrets
+  step before the scripts in each game frame, and a turret fires at a target it picked no sooner
+  than the next, so the script drops the boarding ship from any turret that picks it. And it disables
+  the base's guns while the base is cloaked: the game lets a cloaked ship's turrets fire, which no
+  released mission shows, and firing would give the hidden base away.
+- `boarding13.luau`, run with mission 13, keeps the boarding ship from harm while it holds off.
+  After each drop-off and pickup the script sends it to "Limpet hold off point", far from the base,
+  and the Basilisks it then sends at the wing and the boarding ship hunt it there: they destroyed it
+  within seconds of reaching it. It is invulnerable from being sent there until it is sent back in,
+  and the wing still has to protect it on its runs to and from the base. The script only undoes
+  the invulnerability it gave.
 - `fixes17.luau`, run with mission 17, aims a friendly torpedo whose part of the Gegarin is gone at
   her hull. A torpedo goes off against whatever part it strikes, so the Cougars' first torpedoes
   can destroy the parts the later ones are aimed at, and a torpedo aimed at a part that's gone flies

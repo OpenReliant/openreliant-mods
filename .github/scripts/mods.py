@@ -399,7 +399,19 @@ def git_lines(*arguments: str) -> list[str]:
 
 
 def version_tuple(text: str) -> tuple[int, ...]:
-    return tuple(int(part) for part in text.lstrip("v").split(".") if part.isdigit())
+    """A version such as 1.2, v1.1.0 or 1.1.0-rc.3, as numbers that sort in release order: its
+    major, minor and patch numbers, missing ones counting as 0, then 1 for a release and 0 for a
+    release candidate, which comes before its release, then the candidate's number. Empty for no
+    version."""
+    core, _, candidate = text.strip().lstrip("v").partition("-")
+    numbers = [int(part) for part in core.split(".") if part.isdigit()]
+    if not numbers:
+        return ()
+    numbers = (numbers + [0, 0])[:3]
+    if not candidate:
+        return (*numbers, 1, 0)
+    count = [int(part) for part in candidate.split(".") if part.isdigit()]
+    return (*numbers, 0, count[-1] if count else 0)
 
 
 def lfs_includes(thumbnails: bool) -> dict[str, list[str]]:
