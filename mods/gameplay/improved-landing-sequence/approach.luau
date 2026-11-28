@@ -9,7 +9,9 @@
 -- landing's cutaway at once.
 --
 -- Without `world.set_escort_marker`, in an OpenReliant that can't show the marker away from an
--- object, the script lets the landing go as in the game.
+-- object, the script lets the landing go as in the game. It does so too in the first part of a
+-- mission that has a second part, such as mission 25, where the 45th lands its Kamovs on the
+-- Yamato before it flies out again.
 
 local hooks = require("openreliant.hooks")
 local records = require("openreliant.records")
@@ -66,14 +68,39 @@ local function approachOf(carrier)
     return { carrier = carrier, offset = known.offset * carrier.radius, turn = turn }
 end
 
--- The number of the mod's objective in the mission that runs, from 0, if it has one.
-local function objectiveNumber()
+-- The campaign's record of the mission that runs, and whether it runs its own file,
+-- mission<number>.dte, rather than its second part, mission<number>1.dte.
+local function missionRecord()
     local mission = world.mission
     if mission == nil then
+        return nil, false
+    end
+    local ok, record = pcall(function()
+        return records.missions[mission.number]
+    end)
+    if not ok then
+        return nil, false
+    end
+    return record, mission.file:lower() == `mission{mission.number}.dte`
+end
+
+-- Whether the mod changes the landing in the mission that runs: not in the first part of a
+-- mission that goes on to a second part, whose landing leads into it.
+local function changesLanding()
+    local record, own_file = missionRecord()
+    return not (record ~= nil and own_file and record.second_part)
+end
+
+-- The number of the mod's objective in the mission that runs, from 0, if it has one. A second
+-- part takes its objectives from the game's own table rather than the mission's record, so it
+-- has none of the mod's.
+local function objectiveNumber()
+    local record, own_file = missionRecord()
+    if record == nil or not own_file then
         return nil
     end
     local ok, names = pcall(function()
-        return records.missions[mission.number].objectives
+        return record.objectives
     end)
     if not ok or names == nil then
         return nil
@@ -123,7 +150,7 @@ local function inMarker()
 end
 
 hooks.add("permission_to_land", function()
-    if has_marker then
+    if has_marker and changesLanding() then
         requested_at = clock
     end
 end)
