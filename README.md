@@ -11,9 +11,9 @@ Missions brings the free trial's two missions, with their lines and movies, and 
 Missions restores four missions cut from the campaign, from the Dreamcast version's disc. They all
 work over your copy of the game.
 
-**[Browse and download the mods](https://openreliant.github.io/openreliant-mods/)**, by category,
-each from its latest release, and see [the latest updates](https://openreliant.github.io/openreliant-mods/updates/).
-The released mods are also listed as data in [`mods.json`](https://openreliant.github.io/openreliant-mods/mods.json),
+**[Browse and download the mods](https://mods.openreliant.space/)**, by category,
+each from its latest release, and see [the latest updates](https://mods.openreliant.space/updates/).
+The released mods are also listed as data in [`mods.json`](https://mods.openreliant.space/mods.json),
 which OpenReliant reads to list and install them from its mods screen.
 
 ## Mods
@@ -182,8 +182,8 @@ A mod's version is the `Version` in its `mod.ini`. To release it, raise the vers
    the commits that changed the mod since its last release as its notes;
 3. posts the new release to `#mod-releases` if `DISCORD_MOD_RELEASES_WEBHOOK` is set in the
    repository's Actions secrets. The post links to the mod's page and release notes;
-4. rebuilds the [site](https://openreliant.github.io/openreliant-mods/): the mods by category, and
-   [the updates](https://openreliant.github.io/openreliant-mods/updates/), every release with what
+4. rebuilds the [site](https://mods.openreliant.space/): the mods by category, and
+   [the updates](https://mods.openreliant.space/updates/), every release with what
    changed in it, newest first.
 
 A version that has a release already is left alone, so other changes to `main` release nothing. A
