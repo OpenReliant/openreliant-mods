@@ -9,9 +9,8 @@
 -- landing's cutaway at once.
 --
 -- Without `world.set_escort_marker`, in an OpenReliant that can't show the marker away from an
--- object, the script lets the landing go as in the game. It does so too in the first part of a
--- mission that has a second part, such as mission 25, where the 45th lands its Kamovs on the
--- Yamato before it flies out again.
+-- object, the script lets the landing go as in the game. It does so too in the first part of
+-- mission 25, where the 45th lands its Kamovs on the Yamato before it flies out again.
 
 local hooks = require("openreliant.hooks")
 local records = require("openreliant.records")
@@ -84,11 +83,15 @@ local function missionRecord()
     return record, mission.file:lower() == `mission{mission.number}.dte`
 end
 
--- Whether the mod changes the landing in the mission that runs: not in the first part of a
--- mission that goes on to a second part, whose landing leads into it.
+-- The mission whose first part keeps the game's landing: mission 25, where the 45th lands its
+-- Kamovs on the Yamato, and the landing leads into the second part.
+local kamov_landing = 25
+
+-- Whether the mod changes the landing in the mission that runs.
 local function changesLanding()
-    local record, own_file = missionRecord()
-    return not (record ~= nil and own_file and record.second_part)
+    local mission = world.mission
+    local _, own_file = missionRecord()
+    return not (mission ~= nil and mission.number == kamov_landing and own_file)
 end
 
 -- The number of the mod's objective in the mission that runs, from 0, if it has one. A second
